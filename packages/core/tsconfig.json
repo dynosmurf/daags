@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./src",
+        "isolatedModules": false,
+        "target": "ES2020", // Target modern JavaScript
+        "module": "ESNext", // Use ES module system
+        "moduleResolution": "node", // Resolve modules like Node.js
+        "outDir": "./dist", // Output directory for compiled files
+        "esModuleInterop": true, // For compatibility with CommonJS modules
+        "strict": true, // Enable all strict type-checking options
+        "declaration": true, // Generate .d.ts files
+        "declarationDir": "./dist", // Output directory for type definitions
+        "skipLibCheck": true // Skip type checking of declaration files
+    },
+    "include": [
+        "src/**/*"
+    ], // Include all TypeScript files in the src folder
+    "exclude": [
+        "node_modules"
+    ] // Exclude node_modules folder
+}

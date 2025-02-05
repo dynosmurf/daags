@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "target": "esnext",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "paths": {
+      "@daags/core": ["packages/core/src"],
+      "@daags/hooks": ["packages/hooks/src"],
+      "@daags/visualizer": ["packages/visualizer/src"]
+    },
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "types": [
+      "vite/client",
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ]
+  },
+  "include": [
+    "packages/**/*",
+    "examples/**/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
