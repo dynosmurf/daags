@@ -26,7 +26,7 @@ module.exports = {
     'import/namespace': 'off',
 
     // Code style and best practices
-    semi: ['error', 'always'], // Enforce semicolons
+    // semi: ['error', 'always'], // Enforce semicolons
     quotes: ['error', 'single'], // Enforce single quotes for strings
     'no-console': 'warn', // Warn about console.log
     'no-unused-vars': 'warn', // Warn about unused variables
@@ -44,4 +44,4 @@ module.exports = {
     }],
     */
   }
-}
+};
