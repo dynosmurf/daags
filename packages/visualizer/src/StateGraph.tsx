@@ -1,5 +1,6 @@
-import { Entity, Mutation, History } from '@daags/core'
+import { Entity, History } from '@daags/core'
 
+// eslint-disable-next-line import/namespace
 import * as d3 from 'd3'
 import * as d3dag from 'd3-dag'
 import { useEffect, useMemo, useState } from 'react'
@@ -22,24 +23,24 @@ function arrowTransform({
 }
 
 function getData(entities: { [key: string]: Entity<any, any> }) {
-  let entityList = Object.values(entities)
-  let entityKeys = Object.keys(entities)
-  let entityToId = new Map()
-  let idToEntity = new Map()
+  const entityList = Object.values(entities)
+  const entityKeys = Object.keys(entities)
+  const entityToId = new Map()
+  const idToEntity = new Map()
 
   for (let i = 0; i < entityList.length; i++) {
-    let entity = entityList[i]
-    let key = entityKeys[i]
+    const entity = entityList[i]
+    const key = entityKeys[i]
     entityToId.set(entity, key)
     idToEntity.set(key, entity)
   }
 
-  let data = []
+  const data = []
   for (let i = 0; i < entityList.length; i++) {
-    let entity = entityList[i]
-    let key = entityKeys[i]
-    let parents = entity.getParents()
-    let parentIds = parents.map((parent: any) => entityToId.get(parent))
+    const entity = entityList[i]
+    const key = entityKeys[i]
+    const parents = entity.getParents()
+    const parentIds = parents.map((parent: any) => entityToId.get(parent))
 
     data.push({
       id: key,
@@ -81,24 +82,19 @@ function getGraph(data: any, config: any) {
   return { graph, width, height }
 }
 
-interface StateHistory {
-  timestamp: number
-  state: Record<string, Entity<any, any>>
-}
-
 export function StateGraph() {
-  let entities = Entity.registered
-  let history = History.events
-  let [historyLength, setHistoryLength] = useState<number>(history.length)
+  const entities = Entity.registered
+  const history = History.events
+  const [historyLength, setHistoryLength] = useState<number>(history.length)
 
-  let [activeNode, setActiveNode] = useState<string | null>(null)
+  const [activeNode, setActiveNode] = useState<string | null>(null)
 
-  let line = d3.line().curve(d3.curveMonotoneY)
+  const line = d3.line().curve(d3.curveMonotoneY)
   const arrowSize = 80
   const arrowLen = Math.sqrt((4 * arrowSize) / Math.sqrt(3))
   const arrow = d3.symbol().type(d3.symbolTriangle).size(arrowSize)
 
-  let [currentEventIdx, setCurrentEventIdx] = useState<number>(-1)
+  const [currentEventIdx, setCurrentEventIdx] = useState<number>(-1)
 
   let currentEntityState = entities
   if (historyLength > 0) {
@@ -107,15 +103,15 @@ export function StateGraph() {
         ? history[currentEventIdx].snapshot
         : history[history.length - 1].snapshot
   }
-  let activeEntity =
+  const activeEntity =
     activeNode && currentEntityState && currentEntityState[activeNode]
 
-  let activeMutation =
+  const activeMutation =
     history[currentEventIdx] &&
-    history[currentEventIdx].type == 'mutation' &&
+    history[currentEventIdx].type === 'mutation' &&
     history[currentEventIdx]
 
-  let handleSetIdx = (newIdx: number) => {
+  const handleSetIdx = (newIdx: number) => {
     setCurrentEventIdx(newIdx)
     if (
       newIdx >= 0 &&
@@ -127,19 +123,18 @@ export function StateGraph() {
 
   useEffect(() => {
     // for each entity add onChange listener to increment v
-    let entityList = Object.values(entities)
-    let onEventHandlers: any[] = []
-    let onMountHandlers: any[] = []
+    const entityList = Object.values(entities)
+    const onMountHandlers: any[] = []
 
-    let handleUpdate = () => {
+    const handleUpdate = () => {
       if (history.length > 0) {
         setHistoryLength(history.length)
       }
     }
     History.eventEmitter.addEventListener('event', handleUpdate)
 
-    for (let entity of entityList) {
-      let handleMount = () => {
+    for (const entity of entityList) {
+      const handleMount = () => {
         handleUpdate()
       }
       entity.onMountChange(handleMount)
@@ -147,42 +142,41 @@ export function StateGraph() {
     }
     return () => {
       for (let i = 0; i < entityList.length; i++) {
-        let entity = entityList[i]
+        const entity = entityList[i]
         entity.cancelOnMount(onMountHandlers[i])
       }
       History.eventEmitter.removeEventListener('event', handleUpdate)
     }
   }, [])
 
-  let { graph, width, height } = useMemo(() => {
-    let data = getData(currentEntityState)
+  const { graph, width, height } = useMemo(() => {
+    const data = getData(currentEntityState)
     return getGraph(data, {
       nodeRadius: 40
     })
   }, [currentEntityState])
 
-  let nodes = [...graph.nodes()]
-  let links = [...graph.links()]
+  const nodes = [...graph.nodes()]
+  const links = [...graph.links()]
 
-  let getStroke = (entity: Entity<any, any>) => {
+  const getStroke = (entity: Entity<any, any>) => {
     if (!entity.isMounted()) {
       return '#CCCCCC'
     }
-    if (entity.getDirectMounts() == 0) {
+    if (entity.getDirectMounts() === 0) {
       return '#000000'
     }
     return '#000000'
   }
 
-  let getStrokeWidth = (entity: Entity<any, any>) => {
+  const getStrokeWidth = (entity: Entity<any, any>) => {
     if (entity.getDirectMounts() > 0) {
       return 4
     }
     return 2
   }
 
-  if (historyLength > 0) {
-  } else {
+  if (historyLength === 0) {
     return <></>
   }
 
@@ -270,7 +264,7 @@ export function StateGraph() {
                 <div key={`1${i}-${s['timestamp']}-${s['type']}`}>
                   <a
                     className={
-                      i == currentEventIdx ? 'text-yellow-700' : 'text-black'
+                      i === currentEventIdx ? 'text-yellow-700' : 'text-black'
                     }
                     onClick={() => handleSetIdx(i)}
                   >

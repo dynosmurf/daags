@@ -13,15 +13,16 @@ import { useEntity } from '@daags/hooks'
 import { Spinner } from './ui/Spinner'
 
 function App() {
-  let activeDateVal = useEntity(activeDate)
-  let activeEventIdVal = useEntity(activeEventId)
-  let editingActiveEventVal = useEntity(editingActiveEvent)
-  let calendarsVal = useEntity(calendars)
-  let currentMonthEventsVal = useEntity(currentMonthEvents)
+  const activeDateVal = useEntity(activeDate)
+  const activeEventIdVal = useEntity(activeEventId)
+  const editingActiveEventVal = useEntity(editingActiveEvent)
+  const calendarsVal = useEntity(calendars)
+  const currentMonthEventsVal = useEntity(currentMonthEvents)
 
-  let isLoaded = calendarsVal !== null && currentMonthEventsVal != null
+  const isLoaded = calendarsVal !== null && currentMonthEventsVal !== null
 
-  let isAsideActive = Number.isFinite(activeEventIdVal) || activeDateVal != null
+  const isAsideActive =
+    Number.isFinite(activeEventIdVal) || activeDateVal !== null
 
   return (
     <div className="relative bg-[#ecfdf5] h-screen overflow-y-auto">
@@ -29,7 +30,7 @@ function App() {
 
       {isLoaded && (
         <div className="flex flex-row h">
-          <div className={`relative flex-1`}>
+          <div className={'relative flex-1'}>
             <Calendar />
           </div>
 

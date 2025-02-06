@@ -7,19 +7,19 @@ import {
 import { useEntity, useMutation } from '@daags/hooks'
 
 export function EventView() {
-  let event = useEntity(activeEvent)
-  let setActiveEventIdFn = useMutation(setActiveEventId)
-  let setEditingActiveEventFn = useMutation(setEditingActiveEvent)
+  const event = useEntity(activeEvent)
+  const setActiveEventIdFn = useMutation(setActiveEventId)
+  const setEditingActiveEventFn = useMutation(setEditingActiveEvent)
 
-  let handleUnfocus = useCallback(() => {
+  const handleUnfocus = useCallback(() => {
     setActiveEventIdFn(null)
   }, [setActiveEventId])
 
-  let handleEdit = useCallback(() => {
+  const handleEdit = useCallback(() => {
     setEditingActiveEventFn(true)
   }, [setEditingActiveEvent])
 
-  if (event == null) {
+  if (event === null) {
     return null
   }
 

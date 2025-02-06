@@ -12,8 +12,9 @@
   "author": "Ryan Murphy <ryan@devmurphy.com> (https://github.com/dynosmurf)",
   "scripts": {
     "build": "pnpm --filter='./examples/*' --filter='./packages/*' run build",
+    "format": "prettier --write .",
     "test": "pnpm --filter='./examples/*' --filter='./packages/*' run test",
-    "lint": "eslint --max-warnings=0",
+    "lint": "eslint",
     "typecheck": "tsc --project tsconfig.json --noEmit"
   },
   "devDependencies": {
@@ -48,5 +49,8 @@
     "npm": ">=7.0.0"
   },
   "repository": "git@github.com:dynosmurf/daags.git",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "eslint-plugin-import": "^2.31.0"
+  }
 }

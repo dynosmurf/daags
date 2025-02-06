@@ -1,6 +1,5 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { getTime, setTime } from '../dates'
-import { useCallback } from 'react'
 import {
   IEvent,
   activeEvent,
@@ -16,16 +15,16 @@ import { useEntity, useMutation } from '@daags/hooks'
 import { Spinner } from './ui/Spinner'
 
 export function EventEdit() {
-  let event = useEntity(activeEvent)
-  let activeEventIdVal = useEntity(activeEventId)
-  let isNew = activeEventIdVal === null
-  let setEditingActiveEventFn = useMutation(setEditingActiveEvent)
-  let createEvent = useMutation(createEventMutation)
-  let updateEvent = useMutation(updateEventMutation)
-  let setActiveEventIdFn = useMutation(setActiveEventId)
-  let eventAPIVal = useEntity(eventAPI)
+  const event = useEntity(activeEvent)
+  const activeEventIdVal = useEntity(activeEventId)
+  const isNew = activeEventIdVal === null
+  const setEditingActiveEventFn = useMutation(setEditingActiveEvent)
+  const createEvent = useMutation(createEventMutation)
+  const updateEvent = useMutation(updateEventMutation)
+  const setActiveEventIdFn = useMutation(setActiveEventId)
+  const eventAPIVal = useEntity(eventAPI)
 
-  let isRequestPending =
+  const isRequestPending =
     Object.values(eventAPIVal?.updateRequests || {})
       .map((request) => {
         return event && request.id === event.id && request.status === 'pending'
@@ -37,13 +36,15 @@ export function EventEdit() {
       })
       .some((e) => e)
 
-  let handleUnfocus = useCallback(() => {
+  const handleUnfocus = useCallback(() => {
     setEditingActiveEventFn(false)
   }, [setEditingActiveEvent])
 
-  let [localEvent, setLocalEvent] = useState<IEvent>(event ?? getDefaultEvent())
+  const [localEvent, setLocalEvent] = useState<IEvent>(
+    event ?? getDefaultEvent()
+  )
 
-  let handleSave = useCallback(() => {
+  const handleSave = useCallback(() => {
     if (isNew) {
       createEvent(localEvent).then((newEvent: IEvent) => {
         setActiveEventIdFn(null)

@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react'
 import { Entity, Mutation } from '@daags/core'
 
 export function useEntity<T>(entity: Entity<T, any>) {
-  let [value, setValue] = useState(entity.getState())
+  const [value, setValue] = useState(entity.getState())
 
   useEffect(() => {
     entity.mount()
     setValue(entity.getState())
 
-    let changeHandler = () => {
+    const changeHandler = () => {
       setValue(entity.getState())
     }
     entity.onChange(changeHandler)

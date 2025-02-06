@@ -20,7 +20,7 @@ import { useEntity, useMutation } from '@daags/hooks'
 import { memo } from 'react'
 
 function formatCount(date: ICalDate, events: IEvent[]) {
-  let count = events.filter(
+  const count = events.filter(
     (e) =>
       e.date.getFullYear() === date.year &&
       e.date.getMonth() + 1 === date.month &&
@@ -30,26 +30,25 @@ function formatCount(date: ICalDate, events: IEvent[]) {
 }
 
 export const Calendar = memo(() => {
-  let activeMonthVal = useEntity(activeMonth)
-  let setActiveMonthFn = useMutation(setActiveMonth)
-  let activeDateVal = useEntity(activeDate)
-  let setActiveDateFn = useMutation(setActiveDate)
-  let setEditingActiveEventFn = useMutation(setEditingActiveEvent)
-  let setActiveEventIdFn = useMutation(setActiveEventId)
+  const activeMonthVal = useEntity(activeMonth)
+  const setActiveMonthFn = useMutation(setActiveMonth)
+  const activeDateVal = useEntity(activeDate)
+  const setActiveDateFn = useMutation(setActiveDate)
+  const setEditingActiveEventFn = useMutation(setEditingActiveEvent)
+  const setActiveEventIdFn = useMutation(setActiveEventId)
 
-  let activeCalendarVal = useEntity(activeCalendar)
-  let events = useEntity(currentMonthEvents)
+  const activeCalendarVal = useEntity(activeCalendar)
+  const events = useEntity(currentMonthEvents)
 
-  if (activeMonthVal == null) {
+  if (activeMonthVal === null) {
     return <>Must specify month to display.</>
   }
-  if (activeCalendarVal == null) {
+  if (activeCalendarVal === null) {
     return <>No matching calander found.</>
   }
-  let eventList = events || []
-  let daysInMonth = getDaysInMonth(activeMonthVal)
+  const eventList = events || []
+  const daysInMonth = getDaysInMonth(activeMonthVal)
 
-  console.log('CAL RENDER')
   return (
     <div className="flex flex-col">
       <h1 className="text-3xl text-center w-full">{activeCalendarVal.name}</h1>
@@ -62,8 +61,8 @@ export const Calendar = memo(() => {
           return (
             <div key={i} className="grid grid-cols-7 w-full">
               {week.map((day, j) => {
-                let isActive = activeDateVal && datesMatch(day, activeDateVal)
-                let isPadding = day.month != activeMonthVal?.month
+                const isActive = activeDateVal && datesMatch(day, activeDateVal)
+                const isPadding = day.month !== activeMonthVal?.month
                 return (
                   <div
                     key={j}

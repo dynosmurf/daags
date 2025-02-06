@@ -1,7 +1,7 @@
 import { previousSunday, addDays } from 'date-fns'
 
 export function setTime(date: Date, time: string) {
-  let [hours, minutes] = time.split(':')
+  const [hours, minutes] = time.split(':')
   date = new Date(date)
   date.setHours(parseInt(hours))
   date.setMinutes(parseInt(minutes))
@@ -53,7 +53,7 @@ export class CalDate implements ICalDate {
 }
 
 export function datesMatch(a: ICalDate | null, b: ICalDate | null) {
-  if (a != null && b != null) {
+  if (a !== null && b !== null) {
     return a.year === b.year && a.month === b.month && a.date === b.date
   }
   return false
@@ -90,19 +90,18 @@ export class CalMonth implements ICalMonth {
 }
 
 export function getDaysInMonth(month: ICalMonth) {
-  let calendarDays: ICalDate[][] = []
+  const calendarDays: ICalDate[][] = []
 
   // date of sunday of first week of month, may be in previous month
-  let date = new Date(month.year, month.month - 1, 1)
-  let firstDay = previousSunday(
+  const date = new Date(month.year, month.month - 1, 1)
+  const firstDay = previousSunday(
     new Date(date.getFullYear(), date.getMonth(), 1)
   )
 
   let currentDay = firstDay
-  let endFound = false
   let j = 0
   while (currentDay.getMonth() === date.getMonth() || j < 7) {
-    let currentWeek = []
+    const currentWeek = []
     for (let i = 0; i < 7; i++) {
       currentWeek.push({
         year: currentDay.getFullYear(),

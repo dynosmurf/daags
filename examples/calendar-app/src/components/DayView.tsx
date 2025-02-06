@@ -13,20 +13,20 @@ import { Spinner } from './ui/Spinner'
 import { useCallback } from 'react'
 
 export function DayView() {
-  let activeDateVal = useEntity(activeDate)
-  let setActiveDateFn = useMutation(setActiveDate)
-  let events = useEntity(activeDateEvents) || []
-  let setActiveEventIdFn = useMutation(setActiveEventId)
-  let eventAPIVal = useEntity(eventAPI)
+  const activeDateVal = useEntity(activeDate)
+  const setActiveDateFn = useMutation(setActiveDate)
+  const events = useEntity(activeDateEvents) || []
+  const setActiveEventIdFn = useMutation(setActiveEventId)
+  const eventAPIVal = useEntity(eventAPI)
 
-  let deleteEventFn = useMutation(deleteEventMutation)
-  let setEditingActiveEventFn = useMutation(setEditingActiveEvent)
+  const deleteEventFn = useMutation(deleteEventMutation)
+  const setEditingActiveEventFn = useMutation(setEditingActiveEvent)
 
-  if (activeDateVal == null) {
+  if (activeDateVal === null) {
     return null
   }
 
-  let isDeletePending = useCallback(
+  const isDeletePending = useCallback(
     (id: number) => {
       return Object.values(eventAPIVal?.deleteRequests || {})
         .map((request) => {
@@ -69,7 +69,7 @@ export function DayView() {
 
       <div className="p-6 space-y-6">
         {events.length === 0 && <div>No events</div>}
-        {events.map((event, i) => {
+        {events.map((event) => {
           return (
             <div
               key={event.id}

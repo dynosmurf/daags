@@ -5,10 +5,10 @@ import { ICalDate, ICalMonth, CalMonth } from './dates'
 Create a modified push state method that triggers window events so we can update
 state in response to url modifications
 */
-var oldPushState = history.pushState
-let myPushState = function (...args: any) {
+const oldPushState = history.pushState
+const myPushState = function (...args: any) {
   oldPushState.apply(history, args)
-  let event = new Event('pushState', args)
+  const event = new Event('pushState', args)
   window.dispatchEvent(event)
 }
 
@@ -41,39 +41,33 @@ export interface ICalendar {
 
 /* urlState */
 
-let urlState = new Entity('urlState' as const, [], () => window.location.href)
+const urlState = new Entity('urlState' as const, [], () => window.location.href)
 
-window.addEventListener('pushState', function (event) {
+window.addEventListener('pushState', function () {
   // make sure whenever we navigate all children are notified of this change
   urlState.handleParentChange()
 })
 
-let setUrlState = new Mutation(
-  'setUrlState' as const,
-  [],
-  (deps, url: string) => myPushState({}, '', url)
-)
-
 /* calendarId */
 
-let getCalendarIdFromUrl = (url: string) => {
-  let parsedUrl = new URL(url)
+const getCalendarIdFromUrl = (url: string) => {
+  const parsedUrl = new URL(url)
   return parseInt(parsedUrl.pathname.split('/')[2], 10)
 }
 
-let navigateToCalendarId = (currentUrl: string, calendarId: number) => {
-  let url = new URL(currentUrl)
-  let params = new URLSearchParams(url.search)
+const navigateToCalendarId = (currentUrl: string, calendarId: number) => {
+  const url = new URL(currentUrl)
+  const params = new URLSearchParams(url.search)
   myPushState({}, '', `/calendar/${calendarId}?${params.toString()}`)
 }
 
-let calendarId = new Entity(
+const calendarId = new Entity(
   'calendarId' as const,
   [urlState],
   (deps: EntityDeps) => getCalendarIdFromUrl(deps[0].getState())
 )
 
-let setCalendarId = new Mutation(
+export const setCalendarId = new Mutation(
   'setCalendarId' as const,
   [urlState],
   (deps, calendarId: number) =>
@@ -88,11 +82,11 @@ export const auth = new Entity('auth' as const, [], () => {
 
 /* calendarAPI */
 
-let calendarAPI = new Entity('calendarApi' as const, [], () => {})
+const calendarAPI = new Entity('calendarApi' as const, [], () => {})
 
 /* calendars */
 
-let calendarDB: Map<number, ICalendar> = new Map()
+const calendarDB: Map<number, ICalendar> = new Map()
 for (let i = 0; i < 5; i++) {
   calendarDB.set(i, {
     id: i,
@@ -105,13 +99,13 @@ for (let i = 0; i < 5; i++) {
 async function getCalendars() {
   // mock api call
 
-  let request_promise = new Promise<ICalendar[]>((resolve, reject) => {
+  const request_promise = new Promise<ICalendar[]>((resolve) => {
     setTimeout(() => {
       resolve([...calendarDB.values()])
     }, 600)
   })
 
-  let calendars = await request_promise
+  const calendars = await request_promise
 
   return calendars
 }
@@ -126,7 +120,7 @@ export const calendars = new Entity(
 
 // TODO: this whole bit needs rethink
 
-let eventsDB: Map<number, IEvent> = new Map()
+const eventsDB: Map<number, IEvent> = new Map()
 for (let i = 0; i < 5; i++) {
   eventsDB.set(i, {
     id: i,
@@ -149,9 +143,9 @@ type APIRequestDict<T> = {
   [key: string]: IAPIRequest<T>
 }
 
-let createRequests: APIRequestDict<any> = {}
-let deleteRequests: APIRequestDict<any> = {}
-let updateRequests: APIRequestDict<any> = {}
+const createRequests: APIRequestDict<any> = {}
+const deleteRequests: APIRequestDict<any> = {}
+const updateRequests: APIRequestDict<any> = {}
 
 function getUUID() {
   return Math.random().toString(36).substring(7)
@@ -159,10 +153,10 @@ function getUUID() {
 
 const createEvent = (newEvent: IEvent) => {
   // mock request promise
-  let requestId = getUUID()
-  let request_promise = new Promise<IEvent>((resolve, reject) => {
+  const requestId = getUUID()
+  const request_promise = new Promise<IEvent>((resolve) => {
     setTimeout(() => {
-      let nextId = Math.max(...eventsDB.keys()) + 1
+      const nextId = Math.max(...eventsDB.keys()) + 1
       newEvent = { ...newEvent, id: nextId }
       eventsDB.set(nextId, newEvent)
       createRequests[requestId] = {
@@ -183,8 +177,8 @@ const createEvent = (newEvent: IEvent) => {
 
 const deleteEvent = (eventId: number) => {
   // mock request promise
-  let requestId = getUUID()
-  let request_promise = new Promise<number>((resolve, reject) => {
+  const requestId = getUUID()
+  const request_promise = new Promise<number>((resolve) => {
     setTimeout(() => {
       eventsDB.delete(eventId)
       deleteRequests[requestId].status = 'success'
@@ -202,10 +196,10 @@ const deleteEvent = (eventId: number) => {
 
 const updateEvent = (modifiedEvent: IEvent) => {
   // mock request promise
-  let requestId = getUUID()
-  let request_promise = new Promise<IEvent>((resolve, reject) => {
+  const requestId = getUUID()
+  const request_promise = new Promise<IEvent>((resolve) => {
     setTimeout(() => {
-      let eventId = modifiedEvent.id
+      const eventId = modifiedEvent.id
       updateRequests[requestId].status = 'success'
       eventsDB.set(eventId, modifiedEvent)
       resolve(modifiedEvent)
@@ -220,7 +214,7 @@ const updateEvent = (modifiedEvent: IEvent) => {
   return request_promise
 }
 
-const getEventApiState = (deps: EntityDeps) => {
+const getEventApiState = () => {
   return {
     createRequests: { ...createRequests },
     deleteRequests: { ...deleteRequests },
@@ -234,7 +228,7 @@ export const createEventMutation = new Mutation(
   'createEvent' as const,
   [eventAPI],
   (deps, event) => {
-    let p = createEvent(event).then((e) => {
+    const p = createEvent(event).then((e) => {
       deps.eventAPI.handleParentChange()
       return e
     })
@@ -246,7 +240,7 @@ export const updateEventMutation = new Mutation(
   'updateEvent' as const,
   [eventAPI],
   (deps, event) => {
-    let p = updateEvent(event).then(() => {
+    const p = updateEvent(event).then(() => {
       deps.eventAPI.handleParentChange()
     })
     deps.eventAPI.handleParentChange()
@@ -257,7 +251,7 @@ export const deleteEventMutation = new Mutation(
   'deleteEvent' as const,
   [eventAPI],
   (deps, eventId) => {
-    let p = deleteEvent(eventId).then(() => {
+    const p = deleteEvent(eventId).then(() => {
       deps.eventAPI.handleParentChange()
     })
     deps.eventAPI.handleParentChange()
@@ -267,9 +261,11 @@ export const deleteEventMutation = new Mutation(
 
 /* activeCalendar */
 
-let getActiveCalendar = ([calendarId, calendars]: EntityDeps) => {
-  let calendars_list = calendars.getState()
-  if (calendars_list == null) return null
+const getActiveCalendar = ([calendarId, calendars]: EntityDeps) => {
+  const calendars_list = calendars.getState()
+  if (calendars_list === null) {
+    return null
+  }
 
   return calendars_list.find((calendar: ICalendar) => {
     return calendar.id === calendarId.getState()
@@ -284,11 +280,13 @@ export const activeCalendar = new Entity(
 
 /* activeMonth */
 
-let getActiveMonthFromUrlParam = (url: string): ICalMonth | null => {
-  let parsedUrl = new URL(url)
-  let params = new URLSearchParams(parsedUrl.search)
-  let activeDateString = params.get('activeMonth')
-  if (!activeDateString) return null
+const getActiveMonthFromUrlParam = (url: string): ICalMonth | null => {
+  const parsedUrl = new URL(url)
+  const params = new URLSearchParams(parsedUrl.search)
+  const activeDateString = params.get('activeMonth')
+  if (!activeDateString) {
+    return null
+  }
   try {
     return new CalMonth(
       parseInt(activeDateString.split('-')[0], 10),
@@ -299,12 +297,12 @@ let getActiveMonthFromUrlParam = (url: string): ICalMonth | null => {
   }
 }
 
-let navigateToActiveMonth = (
+const navigateToActiveMonth = (
   url: string,
   activeDate: ICalMonth | ICalDate | null
 ) => {
-  let parsedUrl = new URL(url)
-  let params = new URLSearchParams(parsedUrl.search)
+  const parsedUrl = new URL(url)
+  const params = new URLSearchParams(parsedUrl.search)
   if (activeDate === null) {
     params.delete('activeMonth')
   } else {
@@ -331,10 +329,10 @@ export const setActiveMonth = new Mutation(
 
 /* currentMonthEvents */
 
-let getEvents = async (calendarId: number) => {
+const getEvents = async (calendarId: number) => {
   // mock api call
 
-  let request_promise = new Promise<IEvent[]>((resolve, reject) => {
+  const request_promise = new Promise<IEvent[]>((resolve) => {
     setTimeout(() => {
       if (calendarId === 4) {
         resolve([...eventsDB.values()])
@@ -344,7 +342,7 @@ let getEvents = async (calendarId: number) => {
     }, 800)
   })
 
-  let events = await request_promise
+  const events = await request_promise
 
   return events
 }
@@ -366,10 +364,12 @@ function getSearchFromPath(url: string) {
   return search
 }
 
-let getActiveDateFromUrlParam = (url: string): ICalDate | null => {
-  let params = new URLSearchParams(getSearchFromPath(url))
-  let activeDateString = params.get('activeDate')
-  if (!activeDateString) return null
+const getActiveDateFromUrlParam = (url: string): ICalDate | null => {
+  const params = new URLSearchParams(getSearchFromPath(url))
+  const activeDateString = params.get('activeDate')
+  if (!activeDateString) {
+    return null
+  }
   try {
     return {
       year: parseInt(activeDateString.split('-')[0], 10),
@@ -381,9 +381,9 @@ let getActiveDateFromUrlParam = (url: string): ICalDate | null => {
   }
 }
 
-let navigateToActiveDate = (url: string, activeDate: ICalDate | null) => {
-  let parsedUrl = new URL(url)
-  let params = new URLSearchParams(parsedUrl.search)
+const navigateToActiveDate = (url: string, activeDate: ICalDate | null) => {
+  const parsedUrl = new URL(url)
+  const params = new URLSearchParams(parsedUrl.search)
   if (activeDate === null) {
     params.delete('activeDate')
   } else {
@@ -413,9 +413,11 @@ export const setActiveDate = new Mutation(
 
 /* activeDateEvents */
 
-let getActiveDateEvents = (activeDate: ICalDate, events: IEvent[]) => {
-  if (events == null || activeDate == null) return null
-  let r =
+const getActiveDateEvents = (activeDate: ICalDate, events: IEvent[]) => {
+  if (events === null || activeDate === null) {
+    return null
+  }
+  const r =
     events.filter((event: IEvent) => {
       return (
         event.date.getFullYear() === activeDate.year &&
@@ -444,15 +446,17 @@ export const importantEvents = new Entity(
 
 /* activeEventId */
 
-let getActiveEventIdFromUrlParam = (url: string) => {
-  let params = new URLSearchParams(new URL(url).search)
-  let activeEventIdString = params.get('activeEventId')
-  if (!activeEventIdString) return null
+const getActiveEventIdFromUrlParam = (url: string) => {
+  const params = new URLSearchParams(new URL(url).search)
+  const activeEventIdString = params.get('activeEventId')
+  if (!activeEventIdString) {
+    return null
+  }
   return parseInt(activeEventIdString, 10)
 }
 
-let navigateToActiveEventId = (url: string, activeEventId: number | null) => {
-  let params = new URLSearchParams(new URL(url).search)
+const navigateToActiveEventId = (url: string, activeEventId: number | null) => {
+  const params = new URLSearchParams(new URL(url).search)
   if (activeEventId === null) {
     params.delete('activeEventId')
   } else {
@@ -475,7 +479,7 @@ export const setActiveEventId = new Mutation(
 
 /* activeEvent */
 
-let getActiveEvent = (activeEventId: number, events: IEvent[]) => {
+const getActiveEvent = (activeEventId: number, events: IEvent[]) => {
   if (!events) {
     return null
   }

@@ -1,9 +1,11 @@
 import cloneDeep from 'lodash.clonedeep'
 
 export type EntityDeps = Entity<any, any>[]
+/* eslint-ignore */
+
 export type ValueFn<T> =
-  | ((deps: EntityDeps) => T)
-  | ((deps: EntityDeps) => Promise<T>)
+  | ((deps: EntityDeps) => T) // eslint-disable-line
+  | ((deps: EntityDeps) => Promise<T>) // eslint-disable-line
 
 export const isEqual = <T>(a: T, b: T): boolean => {
   if (a === b) {
@@ -121,19 +123,19 @@ export class Mutation<
   const T extends readonly [...Entity<any, any>[]],
   P extends any[],
   M,
-  Q
+  Q extends string
 > {
-  public key: string
+  public key: Q
   public static registered: Mutation<any, any, any, string>[] = []
   deps: { [K in T[number]['key']]: Extract<T[number], { key: K }> }
   private fn
 
   constructor(
-    key: string,
+    key: Q,
     entities: T,
     fn: (
-      deps: { [K in T[number]['key']]: Extract<T[number], { key: K }> },
-      ...args: P
+      deps: { [K in T[number]['key']]: Extract<T[number], { key: K }> }, // eslint-disable-line
+      ...args: P // eslint-disable-line
     ) => M
   ) {
     this.key = key
@@ -154,7 +156,7 @@ export class Entity<T, K extends string> {
   public static registered: Record<string, Entity<any, any>> = {}
 
   // State nodes from which the state of this node can be derived either directly or with call to external store
-  public key: string
+  public key: K
   private parents: EntityDeps = []
 
   // State nodes which depend on the value of this state node
@@ -186,7 +188,7 @@ export class Entity<T, K extends string> {
   private mountListeners: (() => void)[] = []
 
   constructor(
-    key: string,
+    key: K,
     parents: EntityDeps,
     valueFn: ValueFn<Promise<T>> | ValueFn<T>
   ) {
@@ -196,7 +198,7 @@ export class Entity<T, K extends string> {
     this.valueFn = valueFn
     // if mutations is a function, we assume it is a setterFn
 
-    for (let parent of parents) {
+    for (const parent of parents) {
       parent.addChild(this)
     }
     Entity.registered[key] = this
@@ -207,7 +209,7 @@ export class Entity<T, K extends string> {
   }
 
   public cancelOnChange(listener: () => void) {
-    let idx = this.listeners.indexOf(listener)
+    const idx = this.listeners.indexOf(listener)
     if (idx >= 0) {
       this.listeners.splice(idx, 1)
     }
@@ -218,7 +220,7 @@ export class Entity<T, K extends string> {
   }
 
   public cancelOnMount(listener: () => void) {
-    let idx = this.mountListeners.indexOf(listener)
+    const idx = this.mountListeners.indexOf(listener)
     if (idx >= 0) {
       this.mountListeners.splice(idx, 1)
     }
@@ -245,13 +247,13 @@ export class Entity<T, K extends string> {
   }
 
   public notifyListeners() {
-    for (let listener of this.listeners) {
+    for (const listener of this.listeners) {
       listener()
     }
   }
 
   private notifyMountListeners() {
-    for (let mountListener of this.mountListeners) {
+    for (const mountListener of this.mountListeners) {
       mountListener()
     }
   }
@@ -284,17 +286,16 @@ export class Entity<T, K extends string> {
       // noop
       return
     }
-    let result = this.valueFn(this.parents)
+    const result = this.valueFn(this.parents)
     if (result instanceof Promise) {
       History.recordChangeEvent(this)
-
       ;(result as Promise<T>).then((value: T) => {
         this.prevValue = this.value
         this.value = cloneDeep(value)
         if (!isEqual(this.value, this.prevValue)) {
           this.version++
           History.recordChangeEvent(this, true)
-          for (let child of this.children) {
+          for (const child of this.children) {
             if (child.getTotalMounts() > 0) {
               child.handleParentChange()
             }
@@ -308,7 +309,7 @@ export class Entity<T, K extends string> {
       if (!isEqual(this.value, this.prevValue)) {
         this.version++
         History.recordChangeEvent(this)
-        for (let child of this.children) {
+        for (const child of this.children) {
           if (child.getTotalMounts() > 0) {
             child.handleParentChange()
           }
@@ -333,11 +334,11 @@ export class Entity<T, K extends string> {
   }
 
   public mount(direct = true) {
-    for (let parent of this.parents) {
+    for (const parent of this.parents) {
       parent.mount(false)
     }
 
-    let notify = !this.isMounted()
+    const notify = !this.isMounted()
 
     this.mounts++
     if (!direct) {
@@ -353,17 +354,19 @@ export class Entity<T, K extends string> {
   }
 
   public unmount(direct = true) {
-    if (!this.isMounted()) return
+    if (!this.isMounted()) {
+      return
+    }
     this.notifyMountListeners()
 
-    for (let parent of this.parents) {
+    for (const parent of this.parents) {
       parent.unmount(false)
     }
     this.mounts--
     if (!direct) {
       this.indirectMounts--
     }
-    if (this.mounts == 0) {
+    if (this.mounts === 0) {
       History.recordUnmountEvent(this)
       this.handleParentChange()
     }
