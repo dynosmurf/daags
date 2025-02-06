@@ -1,5 +1,4 @@
-import { Entity, Mutation } from '@daags/core'
-import { EntityDeps } from '@daags/core/src/state';
+import { Entity, Mutation, EntityDeps } from '@daags/core'
 import { ICalDate, ICalMonth, CalMonth } from './dates';
 
 /**

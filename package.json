@@ -3,35 +3,17 @@
   "description": "A frontend state managment library and visualizer for managing complex application state.",
   "version": "0.1.0",
   "private": true,
-  "types": "dist/index.d.ts",
-  "type": "module",
-  "files": [
-    "dist"
-  ],
   "workspaces": {
     "packages": [
       "packages/*",
       "examples/*"
     ]
   },
-  "main": "./dist/daags.umd.cjs",
-  "module": "./dist/daags.js",
-  "exports": {
-    ".": {
-      "import": "./dist/daags.js",
-      "require": "./dist/daags.umd.cjs",
-      "types": "./dist/index.d.ts"
-    },
-    "./style.css": "./dist/daags.css"
-  },
   "author": "Ryan Murphy <ryan@devmurphy.com> (https://github.com/dynosmurf)",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "serve": "vite preview",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "lint": "eslint src --max-warnings=0",
+    "build": "pnpm --filter='./examples/*' --filter='./packages/*' run build",
+    "test": "pnpm --filter='./examples/*' --filter='./packages/*' run test",
+    "lint": "eslint --max-warnings=0",
     "typecheck": "tsc --project tsconfig.json --noEmit"
   },
   "devDependencies": {
@@ -58,7 +40,7 @@
     "typescript": "^5.2.2",
     "vite": "^4.5.0",
     "vite-plugin-dts": "^4.5.0",
-    "vite-tsconfig-paths": "^4.2.1",
+    "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^0.34.6"
   },
   "engines": {

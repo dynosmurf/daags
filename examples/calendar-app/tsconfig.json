@@ -1,34 +1,14 @@
 {
-    "compilerOptions": {
-      "target": "ES2015",                     // Set the ECMAScript target version (ES5 for wide compatibility)
-      "lib": ["DOM", "ESNext"],             // Includes DOM and ESNext features for React development
-      "module": "ESNext",                   // Use modern module system for compatibility with bundlers like Webpack or Vite
-      "moduleResolution": "node",           // Use Node.js module resolution (important for imports)
-      "allowJs": true,                      // Allows JavaScript files to be included in the compilation process
-      "jsx": "react-jsx",                   // Use the new JSX Transform (react-jsx is required for React 17+)
-      "strict": true,                       // Enable all strict type-checking options (recommended)
-      "skipLibCheck": true,                 // Skip type checking of declaration files (improves performance)
-      "esModuleInterop": true,              // Ensures compatibility with CommonJS modules
-      "forceConsistentCasingInFileNames": true, // Ensures that file names are case-sensitive
-      "baseUrl": ".",                       // Base URL for module resolution (use the root of the project)
-      "paths": {
-        "@daags/core": ["../../packages/core/src"],    // Resolve the core package
-        "@daags/hooks": ["../../packages/hooks/src"]
-      },
-      "resolveJsonModule": true,             // Allows importing JSON files as modules (useful for config files)
-      "noEmit": true,                       // Don't generate output files; TypeScript will only type-check
-      "isolatedModules": true,               // Ensures that each file is treated as an isolated module (useful for tsx)
-      "types": ["react", "react-dom"]       // Type declarations for React and React DOM
-    },
-    "include": [
-      "src/**/*",                            // Include all files in the src folder
-      "src/**/*.tsx",                        // Include TypeScript React files
-      "src/**/*.ts"                          // Include TypeScript files
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "lib": [
+      "DOM",
+      "ESNext"
     ],
-    "exclude": [
-      "node_modules",                        // Exclude node_modules folder
-      "build",                               // Exclude build folder (if you're using it for output)
-      "dist"                                 // Exclude dist folder
+    "types": [
+      "react",
+      "react-dom"
     ]
-  }
+  },
+}
   

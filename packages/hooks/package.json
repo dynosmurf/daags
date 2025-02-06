@@ -1,20 +1,26 @@
 {
-    "name": "@daags/hooks",
-    "version": "0.1.0",
-    "main": "index.ts",
-    "module": "dist/index.mjs",
-    "types": "dist/index.d.ts",
-    "scripts": {
-        "build": "vite build",
-        "dev": "vite"
-    },
-    "dependencies": {
-        "@daags/core": "workspace:*",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0"
-    },
-    "devDependencies": {
-        "@types/react": "^18.2.34",
-        "@types/react-dom": "^18.2.14"
-    }
+  "name": "@daags/hooks",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/daags-hooks.cjs.js",
+  "module": "./dist/daags-hooks.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": "./dist/daags-hooks.es.js",
+    "require": "./dist/daags-hooks.cjs.js",
+    "types": "./dist/index.d.ts",
+    "development": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@daags/core": "workspace:*",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.34",
+    "@types/react-dom": "^18.2.14"
+  }
 }

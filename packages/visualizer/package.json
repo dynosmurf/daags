@@ -1,12 +1,18 @@
 {
     "name": "@daags/visualizer",
     "version": "0.1.0",
-    "main": "index.ts",
-    "module": "dist/index.mjs",
-    "types": "dist/index.d.ts",
+    "type": "module",
+    "main": "./dist/daags-visualizer.cjs.js",
+    "module": "./dist/daags-visualizer.es.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      "import": "./dist/daags-visualizer.es.js",
+      "require": "./dist/daags-visualizer.cjs.js",
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts"
+    },
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "build": "vite build"
     },
     "dependencies": {
         "@daags/core": "workspace:*",

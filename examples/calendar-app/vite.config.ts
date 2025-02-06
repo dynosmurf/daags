@@ -8,11 +8,4 @@ export default defineConfig({
   build: {
     outDir: 'dist',  // Where the built files will go
   },
-  resolve: {
-    alias: {
-      '@daags/core': path.resolve(__dirname, '../../packages/core/index.ts'), 
-      '@daags/hooks': path.resolve(__dirname, '../../packages/hooks/index.ts'),
-      '@daags/visualizer': path.resolve(__dirname, '../../packages/visualizer/index.ts'),
-    }
-  }
 });

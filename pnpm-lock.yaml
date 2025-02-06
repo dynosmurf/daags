@@ -78,7 +78,7 @@ importers:
         specifier: ^4.5.0
         version: 4.5.0(@types/node@20.17.17)(rollup@3.29.5)(typescript@5.7.3)(vite@4.5.9(@types/node@20.17.17))
       vite-tsconfig-paths:
-        specifier: ^4.2.1
+        specifier: ^4.3.2
         version: 4.3.2(typescript@5.7.3)(vite@4.5.9(@types/node@20.17.17))
       vitest:
         specifier: ^0.34.6

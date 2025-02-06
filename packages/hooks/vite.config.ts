@@ -8,10 +8,19 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'daags-core',
-      fileName: (format) => `daags-core.${format}.js`,
+      name: 'daags-hooks',
+      fileName: (format) => `daags-hooks.${format}.js`,
       formats: ['es', 'cjs', 'umd']
-    }
+    },
+    rollupOptions: {
+      external: ['react', 'react-dom'], // Mark dependencies as external
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+        },
+      },
+    },
   },
   plugins: [dts({ insertTypesEntry: true }), tsconfigPaths()]
 })

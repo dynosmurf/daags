@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "target": "esnext",
+    "target": "ES6",
     "lib": [
       "dom",
       "dom.iterable",
@@ -9,10 +9,12 @@
     ],
     "paths": {
       "@daags/core": ["packages/core/src"],
+      "@daags/core/*": ["packages/core/src/*"],
       "@daags/hooks": ["packages/hooks/src"],
+      "@daags/hooks/*": ["packages/hooks/src/*"],
       "@daags/visualizer": ["packages/visualizer/src"]
     },
-    "allowJs": true,
+    "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -35,6 +37,7 @@
     "examples/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "**/node_modules",
+    "**/dist"
   ]
 }
