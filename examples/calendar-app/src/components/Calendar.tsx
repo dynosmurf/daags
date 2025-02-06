@@ -7,21 +7,24 @@ import {
   setActiveMonth,
   setActiveDate,
   setEditingActiveEvent,
-  setActiveEventId,
+  setActiveEventId
 } from '../entities'
 import {
   ICalDate,
-  monthNames, 
+  monthNames,
   getDaysInMonth,
   datesMatch,
-  CalMonth,
+  CalMonth
 } from '../dates'
 import { useEntity, useMutation } from '@daags/hooks'
 import { memo } from 'react'
 
 function formatCount(date: ICalDate, events: IEvent[]) {
   let count = events.filter(
-    (e) => e.date.getFullYear() === date.year && e.date.getMonth() + 1 === date.month && e.date.getDate() === date.date
+    (e) =>
+      e.date.getFullYear() === date.year &&
+      e.date.getMonth() + 1 === date.month &&
+      e.date.getDate() === date.date
   ).length
   return count > 0 ? `(${count})` : ''
 }
@@ -46,12 +49,12 @@ export const Calendar = memo(() => {
   let eventList = events || []
   let daysInMonth = getDaysInMonth(activeMonthVal)
 
-  console.log("CAL RENDER")
+  console.log('CAL RENDER')
   return (
     <div className="flex flex-col">
       <h1 className="text-3xl text-center w-full">{activeCalendarVal.name}</h1>
       <h2 className="text-2xl text-center w-full">
-        {monthNames[activeMonthVal.month - 1]} {activeMonthVal.year} 
+        {monthNames[activeMonthVal.month - 1]} {activeMonthVal.year}
       </h2>
 
       <div className="w-full">

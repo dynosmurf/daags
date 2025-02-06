@@ -10,14 +10,12 @@ import {
   updateEventMutation,
   setActiveEventId,
   getDefaultEvent,
-  eventAPI,
+  eventAPI
 } from '../entities'
 import { useEntity, useMutation } from '@daags/hooks'
 import { Spinner } from './ui/Spinner'
 
-
 export function EventEdit() {
-
   let event = useEntity(activeEvent)
   let activeEventIdVal = useEntity(activeEventId)
   let isNew = activeEventIdVal === null
@@ -27,12 +25,17 @@ export function EventEdit() {
   let setActiveEventIdFn = useMutation(setActiveEventId)
   let eventAPIVal = useEntity(eventAPI)
 
-  let isRequestPending = Object.values(eventAPIVal?.updateRequests || {}).map((request) => {
-    return event && request.id === event.id && request.status === "pending"
-  }).some((e) => e) || Object.values(eventAPIVal?.createRequests || {}).map((request) => {
-    return request.status === "pending"
-  }).some((e) => e);
-
+  let isRequestPending =
+    Object.values(eventAPIVal?.updateRequests || {})
+      .map((request) => {
+        return event && request.id === event.id && request.status === 'pending'
+      })
+      .some((e) => e) ||
+    Object.values(eventAPIVal?.createRequests || {})
+      .map((request) => {
+        return request.status === 'pending'
+      })
+      .some((e) => e)
 
   let handleUnfocus = useCallback(() => {
     setEditingActiveEventFn(false)
@@ -57,16 +60,16 @@ export function EventEdit() {
   return (
     <>
       <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
-        {isNew &&
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Create Event
-        </h3>
-        }
-        {!isNew &&
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-          Edit Event
-        </h3>
-        }
+        {isNew && (
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Create Event
+          </h3>
+        )}
+        {!isNew && (
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Edit Event
+          </h3>
+        )}
         <button
           type="button"
           className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white"
@@ -144,9 +147,7 @@ export function EventEdit() {
             onClick={handleSave}
           >
             Save
-            {isRequestPending && 
-                <Spinner />
-            }
+            {isRequestPending && <Spinner />}
           </button>
         </div>
       </div>

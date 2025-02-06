@@ -26,11 +26,16 @@ export function DayView() {
     return null
   }
 
-  let isDeletePending = useCallback((id: number) => {
-    return Object.values(eventAPIVal?.deleteRequests || {}).map((request) => {
-      return request.id === id && request.status === "pending"
-    }).some((e) => e)
-  }, [eventAPIVal])
+  let isDeletePending = useCallback(
+    (id: number) => {
+      return Object.values(eventAPIVal?.deleteRequests || {})
+        .map((request) => {
+          return request.id === id && request.status === 'pending'
+        })
+        .some((e) => e)
+    },
+    [eventAPIVal]
+  )
 
   return (
     <>
@@ -82,7 +87,7 @@ export function DayView() {
               <div>
                 <button onClick={() => deleteEventFn(event.id)}>x</button>
               </div>
-              {isDeletePending(event.id) && <Spinner/>}
+              {isDeletePending(event.id) && <Spinner />}
             </div>
           )
         })}

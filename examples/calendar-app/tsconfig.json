@@ -1,14 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "lib": [
-      "DOM",
-      "ESNext"
-    ],
-    "types": [
-      "react",
-      "react-dom"
-    ]
-  },
+    "lib": ["DOM", "ESNext"],
+    "types": ["react", "react-dom"]
+  }
 }
-  

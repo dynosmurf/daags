@@ -5,14 +5,8 @@
     "declaration": true,
     "declarationDir": "dist"
   },
-  "types": [
-    "react",
-    "react-dom"
-  ],
-  "lib": [
-    "DOM",
-    "ESNext"
-  ],
+  "types": ["react", "react-dom"],
+  "lib": ["DOM", "ESNext"],
   "exclude": ["*.js", "*.d.ts"],
   "include": ["src/**/*"]
 }

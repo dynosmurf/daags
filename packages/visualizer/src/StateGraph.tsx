@@ -1,4 +1,4 @@
-import { Entity, Mutation, History } from "@daags/core"
+import { Entity, Mutation, History } from '@daags/core'
 
 import * as d3 from 'd3'
 import * as d3dag from 'd3-dag'
@@ -21,9 +21,7 @@ function arrowTransform({
   return `translate(${x2}, ${y2}) rotate(${angle})`
 }
 
-function getData(entities: {
-  [key: string]: Entity<any, any>
-}) {
+function getData(entities: { [key: string]: Entity<any, any> }) {
   let entityList = Object.values(entities)
   let entityKeys = Object.keys(entities)
   let entityToId = new Map()
@@ -57,7 +55,7 @@ function getGraph(data: any, config: any) {
   const builder = d3dag.graphStratify()
   const graph = builder(data)
 
-  // Compute Layout 
+  // Compute Layout
 
   // set the layout functions
   const { nodeRadius } = config
@@ -84,13 +82,13 @@ function getGraph(data: any, config: any) {
 }
 
 interface StateHistory {
-  timestamp: number,
+  timestamp: number
   state: Record<string, Entity<any, any>>
 }
 
 export function StateGraph() {
-  let entities = Entity.registered;
-  let history = History.events;
+  let entities = Entity.registered
+  let history = History.events
   let [historyLength, setHistoryLength] = useState<number>(history.length)
 
   let [activeNode, setActiveNode] = useState<string | null>(null)
@@ -104,15 +102,25 @@ export function StateGraph() {
 
   let currentEntityState = entities
   if (historyLength > 0) {
-    currentEntityState = currentEventIdx >= 0 ? history[currentEventIdx].snapshot : history[history.length - 1].snapshot
-  } 
-  let activeEntity = activeNode && currentEntityState && currentEntityState[activeNode]
+    currentEntityState =
+      currentEventIdx >= 0
+        ? history[currentEventIdx].snapshot
+        : history[history.length - 1].snapshot
+  }
+  let activeEntity =
+    activeNode && currentEntityState && currentEntityState[activeNode]
 
-  let activeMutation = history[currentEventIdx] && history[currentEventIdx].type == "mutation" && history[currentEventIdx]
+  let activeMutation =
+    history[currentEventIdx] &&
+    history[currentEventIdx].type == 'mutation' &&
+    history[currentEventIdx]
 
   let handleSetIdx = (newIdx: number) => {
     setCurrentEventIdx(newIdx)
-    if (newIdx >= 0 &&  ["change", "mount", "unmount"].includes(history[newIdx].type)) {
+    if (
+      newIdx >= 0 &&
+      ['change', 'mount', 'unmount'].includes(history[newIdx].type)
+    ) {
       setActiveNode((history[newIdx] as any).entity.key)
     }
   }
@@ -128,10 +136,9 @@ export function StateGraph() {
         setHistoryLength(history.length)
       }
     }
-    History.eventEmitter.addEventListener("event", handleUpdate)
+    History.eventEmitter.addEventListener('event', handleUpdate)
 
     for (let entity of entityList) {
-
       let handleMount = () => {
         handleUpdate()
       }
@@ -143,12 +150,11 @@ export function StateGraph() {
         let entity = entityList[i]
         entity.cancelOnMount(onMountHandlers[i])
       }
-      History.eventEmitter.removeEventListener("event", handleUpdate)
+      History.eventEmitter.removeEventListener('event', handleUpdate)
     }
   }, [])
 
   let { graph, width, height } = useMemo(() => {
-
     let data = getData(currentEntityState)
     return getGraph(data, {
       nodeRadius: 40
@@ -160,12 +166,12 @@ export function StateGraph() {
 
   let getStroke = (entity: Entity<any, any>) => {
     if (!entity.isMounted()) {
-      return "#CCCCCC"
+      return '#CCCCCC'
     }
     if (entity.getDirectMounts() == 0) {
-      return "#000000"
+      return '#000000'
     }
-    return "#000000"
+    return '#000000'
   }
 
   let getStrokeWidth = (entity: Entity<any, any>) => {
@@ -176,7 +182,6 @@ export function StateGraph() {
   }
 
   if (historyLength > 0) {
-
   } else {
     return <></>
   }
@@ -194,9 +199,7 @@ export function StateGraph() {
                   d={line(link.points) as string}
                   fill="none"
                   strokeWidth="2"
-                  stroke={
-                    getStroke(link.target.data.entity)
-                  }
+                  stroke={getStroke(link.target.data.entity)}
                 />
               )
             })}
@@ -208,13 +211,19 @@ export function StateGraph() {
                 <g
                   key={node.data.id}
                   transform={`translate(${node.x}, ${node.y})`}
-                  onClick={() => { setActiveNode(node.data.id) }}
+                  onClick={() => {
+                    setActiveNode(node.data.id)
+                  }}
                 >
                   <circle
                     r="40"
                     stroke={getStroke(node.data.entity)}
                     strokeWidth={getStrokeWidth(node.data.entity)}
-                    fill={activeEntity && activeEntity.key === node.data.entity.key ? '#e5e7eb' : '#ffffff'}
+                    fill={
+                      activeEntity && activeEntity.key === node.data.entity.key
+                        ? '#e5e7eb'
+                        : '#ffffff'
+                    }
                   />
                   <text
                     fontWeight="bold"
@@ -250,34 +259,55 @@ export function StateGraph() {
           </g>
         </g>
       </svg>
-      <div className='flex px-1'>
-        <div className='px-1 w-1/2'>
-          <div><a onClick={() => handleSetIdx(-1)}>Latest</a></div>
-          {history.map((s: any, i) => {
-            return <div key={`1${i}-${s["timestamp"]}-${s["type"]}`}>
-              <a className={i == currentEventIdx ? "text-yellow-700" : "text-black"} onClick={() => handleSetIdx(i)}>
-                {s["type"]} {s["entity"] && s["entity"].key}{s["mutation"] && s["mutation"].key} {s["async"] && "async"} 
-                </a>
-            </div>
-          }).reverse()}
-
+      <div className="flex px-1">
+        <div className="px-1 w-1/2">
+          <div>
+            <a onClick={() => handleSetIdx(-1)}>Latest</a>
+          </div>
+          {history
+            .map((s: any, i) => {
+              return (
+                <div key={`1${i}-${s['timestamp']}-${s['type']}`}>
+                  <a
+                    className={
+                      i == currentEventIdx ? 'text-yellow-700' : 'text-black'
+                    }
+                    onClick={() => handleSetIdx(i)}
+                  >
+                    {s['type']} {s['entity'] && s['entity'].key}
+                    {s['mutation'] && s['mutation'].key} {s['async'] && 'async'}
+                  </a>
+                </div>
+              )
+            })
+            .reverse()}
         </div>
-        <div className='px-1 w-1/2'>
+        <div className="px-1 w-1/2">
           {activeEntity && (
             <div>
               <p>node: {activeEntity.key}</p>
               <p>directMounts: {activeEntity.getDirectMounts()}</p>
               <p>totalMounts: {activeEntity.getTotalMounts()}</p>
-              <div>value: <pre className="whitespace-pre-wrap">{JSON.stringify(activeEntity.getState(), null, 2)}</pre></div>
+              <div>
+                value:{' '}
+                <pre className="whitespace-pre-wrap">
+                  {JSON.stringify(activeEntity.getState(), null, 2)}
+                </pre>
+              </div>
             </div>
           )}
         </div>
-        <div className='px-1 w-1/2'>
+        <div className="px-1 w-1/2">
           {activeMutation && (
             <div>
               <p>mutation: {activeMutation.mutation.key}</p>
               <p>deps: {Object.keys(activeMutation.mutation.deps)}</p>
-              <div>args: <pre className="whitespace-pre-wrap">{JSON.stringify(activeMutation.args, null, 2)}</pre></div>
+              <div>
+                args:{' '}
+                <pre className="whitespace-pre-wrap">
+                  {JSON.stringify(activeMutation.args, null, 2)}
+                </pre>
+              </div>
             </div>
           )}
         </div>

@@ -1,31 +1,31 @@
 {
-    "name": "@daags/visualizer",
-    "version": "0.1.0",
-    "type": "module",
-    "main": "./dist/daags-visualizer.cjs.js",
-    "module": "./dist/daags-visualizer.es.js",
+  "name": "@daags/visualizer",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/daags-visualizer.cjs.js",
+  "module": "./dist/daags-visualizer.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "import": "./dist/daags-visualizer.es.js",
+    "require": "./dist/daags-visualizer.cjs.js",
     "types": "./dist/index.d.ts",
-    "exports": {
-      "import": "./dist/daags-visualizer.es.js",
-      "require": "./dist/daags-visualizer.cjs.js",
-      "types": "./dist/index.d.ts",
-      "development": "./src/index.ts"
-    },
-    "scripts": {
-        "build": "vite build"
-    },
-    "dependencies": {
-        "@daags/core": "workspace:*",
-        "d3": "^7.8.5",
-        "d3-dag": "^1.1.0",
-        "lodash.clonedeep": "^4.5.0",
-        "react": "^18.2.0",
-        "react-dom": "^18.2.0"
-    },
-    "devDependencies": {
-        "@types/d3": "^7.4.3",
-        "@types/lodash.clonedeep": "^4.5.9",
-        "@types/react": "^18.2.34",
-        "@types/react-dom": "^18.2.14"
-    }
+    "development": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@daags/core": "workspace:*",
+    "d3": "^7.8.5",
+    "d3-dag": "^1.1.0",
+    "lodash.clonedeep": "^4.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/lodash.clonedeep": "^4.5.9",
+    "@types/react": "^18.2.34",
+    "@types/react-dom": "^18.2.14"
+  }
 }

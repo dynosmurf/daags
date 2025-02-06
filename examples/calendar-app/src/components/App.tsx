@@ -25,9 +25,7 @@ function App() {
 
   return (
     <div className="relative bg-[#ecfdf5] h-screen overflow-y-auto">
-      {!isLoaded && (
-        <Spinner />
-      )}
+      {!isLoaded && <Spinner />}
 
       {isLoaded && (
         <div className="flex flex-row h">
@@ -36,9 +34,13 @@ function App() {
           </div>
 
           <aside
-            className={`${isAsideActive ? 'w-[400px] ease-out' : 'w-0 ease-in'}`}
+            className={`${
+              isAsideActive ? 'w-[400px] ease-out' : 'w-0 ease-in'
+            }`}
           >
-            {activeDateVal && !Number.isFinite(activeEventIdVal) && !editingActiveEventVal && <DayView />}
+            {activeDateVal &&
+              !Number.isFinite(activeEventIdVal) &&
+              !editingActiveEventVal && <DayView />}
 
             {Number.isFinite(activeEventIdVal) && <EventView />}
 

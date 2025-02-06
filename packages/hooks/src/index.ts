@@ -1,3 +1,3 @@
-import { useEntity, useMutation } from "./hooks";
+import { useEntity, useMutation } from './hooks'
 
 export { useEntity, useMutation }
