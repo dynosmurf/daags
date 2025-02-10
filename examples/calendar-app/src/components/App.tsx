@@ -7,9 +7,11 @@ import {
   activeEventId,
   editingActiveEvent,
   calendars,
-  currentMonthEvents
+  currentMonthEvents,
+  activeCalendar,
+  setCalendarId
 } from '../entities'
-import { useEntity } from '@daags/hooks'
+import { useEntity, useMutation } from '@daags/hooks'
 import { Spinner } from './ui/Spinner'
 
 function App() {
@@ -17,7 +19,9 @@ function App() {
   const activeEventIdVal = useEntity(activeEventId)
   const editingActiveEventVal = useEntity(editingActiveEvent)
   const calendarsVal = useEntity(calendars)
+  const activeCalendarVal = useEntity(activeCalendar)
   const currentMonthEventsVal = useEntity(currentMonthEvents)
+  const setActiveCalendar = useMutation(setCalendarId)
 
   const isLoaded = calendarsVal !== null && currentMonthEventsVal !== null
 
@@ -25,10 +29,23 @@ function App() {
     Number.isFinite(activeEventIdVal) || activeDateVal !== null
 
   return (
-    <div className="relative bg-[#ecfdf5] h-screen overflow-y-auto">
+    <div className="relative bg-[#fff] h-screen overflow-y-auto">
       {!isLoaded && <Spinner />}
+      {isLoaded && !activeCalendarVal && (
+        <div className="flex items-center justify-center min-h-screen">
+          <div>
+            {calendarsVal.map((cal) => {
+              return (
+                <div className="p-2" onClick={() => setActiveCalendar(cal.id)}>
+                  {cal.name}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
-      {isLoaded && (
+      {isLoaded && activeCalendarVal && (
         <div className="flex flex-row h">
           <div className={'relative flex-1'}>
             <Calendar />
@@ -43,7 +60,9 @@ function App() {
               !Number.isFinite(activeEventIdVal) &&
               !editingActiveEventVal && <DayView />}
 
-            {Number.isFinite(activeEventIdVal) && <EventView />}
+            {!editingActiveEventVal && Number.isFinite(activeEventIdVal) && (
+              <EventView />
+            )}
 
             {editingActiveEventVal && <EventEdit />}
           </aside>

@@ -5,6 +5,7 @@ import {
   setEditingActiveEvent
 } from '../entities'
 import { useEntity, useMutation } from '@daags/hooks'
+import { format } from 'date-fns'
 
 export function EventView() {
   const event = useEntity(activeEvent)
@@ -27,7 +28,7 @@ export function EventView() {
     <>
       <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-          {event.title}
+          Event Details
         </h3>
         <button
           type="button"
@@ -53,21 +54,39 @@ export function EventView() {
         </button>
       </div>
 
-      <div className="flex flex-col">
-        <div className="flex flex-row justify-between items-center">
-          <div className="text-lg font-bold">
-            {event.startTime.toDateString()}
+      <div className="px-4 py-2">
+        <div className="my-2">
+          <h3 className="text-lg font-bold">{event.title}</h3>
+        </div>
+        <div className="my-2">
+          <div>
+            <span className="font-thin">On:</span>{' '}
+            {format(event.date, 'MMMM do, u')}
           </div>
-          <div className="text-lg font-bold">
-            {event.endTime.toDateString()}
+          <div className="">
+            <span className="font-thin">From:</span>{' '}
+            {format(event.startTime, 'h:mm a')}
+          </div>
+          <div className="">
+            <span className="font-thin">To:</span>{' '}
+            {format(event.endTime, 'h:mm a')}
+          </div>
+        </div>
+        <div className="my-2">
+          <div>
+            <span className="font-thin">Notes:</span> {event.description}
           </div>
         </div>
       </div>
-      <div className="flex flex-row justify-between items-center">
-        <div className="text-lg font-bold">{event.description}</div>
-      </div>
-      <div>
-        <button onClick={handleEdit}>Edit</button>
+      <div className="my-2 flex items-center py-2 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600 justify-end">
+        <button
+          data-modal-hide="default-modal"
+          type="button"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          onClick={handleEdit}
+        >
+          Edit Event
+        </button>
       </div>
     </>
   )

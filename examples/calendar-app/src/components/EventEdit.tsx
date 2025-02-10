@@ -95,7 +95,8 @@ export function EventEdit() {
         </button>
       </div>
       <div>
-        <div className="flex flex-col justify-between items-center p-4">
+        <div className="flex flex-col justify-between p-4">
+          <label className="px-2 font-thin text-sm">Title</label>
           <input
             type="text"
             className="border rounded-sm m-2 w-full p-2"
@@ -105,10 +106,12 @@ export function EventEdit() {
               setLocalEvent({ ...localEvent, title: e.target.value })
             }
           />
-          <div className="flex flex-col justify-between items-center">
-            <div className="text-lg font-bold">
-              <label className="font-normal">Start Time</label>
+
+          <div className="py-2">
+            <label className="px-2 font-thin text-sm">Start Time</label>
+            <div>
               <input
+                className="px-2"
                 type="time"
                 value={getTime(localEvent.startTime)}
                 onChange={(e) =>
@@ -119,9 +122,12 @@ export function EventEdit() {
                 }
               />
             </div>
-            <div className="text-lg font-bold">
-              <label className="font-normal">End Time</label>
+          </div>
+          <div className="py-2">
+            <label className="px-2 font-thin text-sm">End Time</label>
+            <div>
               <input
+                className="px-2"
                 type="time"
                 value={getTime(localEvent.endTime)}
                 onChange={(e) =>
@@ -133,14 +139,17 @@ export function EventEdit() {
               />
             </div>
           </div>
-          <textarea
-            placeholder="Description"
-            className="border rounded-sm m-2 w-full p-2"
-            value={localEvent.description}
-            onChange={(e) =>
-              setLocalEvent({ ...localEvent, description: e.target.value })
-            }
-          />
+          <div className="py-2">
+            <label className="px-2 font-thin text-sm">Notes</label>
+            <textarea
+              placeholder="Description"
+              className="border rounded-sm m-2 w-full p-2"
+              value={localEvent.description}
+              onChange={(e) =>
+                setLocalEvent({ ...localEvent, description: e.target.value })
+              }
+            />
+          </div>
         </div>
         <div className="p-4 border-t rounded-b dark:border-gray-600">
           <button

@@ -74,6 +74,16 @@ export const setCalendarId = new Mutation(
     navigateToCalendarId(deps.urlState.getState() || '', calendarId)
 )
 
+export const clearCalendarId = new Mutation(
+  'clearCalendarId' as const,
+  [urlState],
+  (deps) => {
+    const url = new URL(deps.urlState.getState() || '')
+    const params = new URLSearchParams(url.search)
+    myPushState({}, '', `/calendar?${params.toString()}`)
+  }
+)
+
 /* auth */
 
 export const auth = new Entity('auth' as const, [], () => {
@@ -119,15 +129,27 @@ export const calendars = new Entity(
 /* eventAPI */
 
 // TODO: this whole bit needs rethink
-
+const eventTitles = [
+  'Date Night',
+  'Football Game',
+  'Design Review',
+  'Sales meeting',
+  'Movie Night'
+]
 const eventsDB: Map<number, IEvent> = new Map()
 for (let i = 0; i < 5; i++) {
   eventsDB.set(i, {
     id: i,
-    title: `Event ${i}`,
-    date: new Date(`${new Date().toISOString().split('T')[0]}T00:00:00.000Z`),
-    startTime: new Date(),
-    endTime: new Date(),
+    title: eventTitles[i],
+    date: new Date(
+      `${new Date().toISOString().split('T')[0]}T0${i}:00:00.000Z`
+    ),
+    startTime: new Date(
+      `${new Date().toISOString().split('T')[0]}T0${i}:00:00.000Z`
+    ),
+    endTime: new Date(
+      `${new Date().toISOString().split('T')[0]}T0${i + 1}:00:00.000Z`
+    ),
     description: `This is event ${i}`
   })
 }

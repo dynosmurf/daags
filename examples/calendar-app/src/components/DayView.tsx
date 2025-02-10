@@ -1,4 +1,3 @@
-import { getTime } from '../dates'
 import {
   activeDate,
   activeDateEvents,
@@ -11,6 +10,25 @@ import {
 import { useEntity, useMutation } from '@daags/hooks'
 import { Spinner } from './ui/Spinner'
 import { useCallback } from 'react'
+import { format } from 'date-fns'
+
+function TrashIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      x="0px"
+      y="0px"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+    >
+      <path
+        fill="currentColor"
+        d="M 10 2 L 9 3 L 4 3 L 4 5 L 5 5 L 5 20 C 5 20.522222 5.1913289 21.05461 5.5683594 21.431641 C 5.9453899 21.808671 6.4777778 22 7 22 L 17 22 C 17.522222 22 18.05461 21.808671 18.431641 21.431641 C 18.808671 21.05461 19 20.522222 19 20 L 19 5 L 20 5 L 20 3 L 15 3 L 14 2 L 10 2 z M 7 5 L 17 5 L 17 20 L 7 20 L 7 5 z M 9 7 L 9 18 L 11 18 L 11 7 L 9 7 z M 13 7 L 13 18 L 15 18 L 15 7 L 13 7 z"
+      ></path>
+    </svg>
+  )
+}
 
 export function DayView() {
   const activeDateVal = useEntity(activeDate)
@@ -37,11 +55,14 @@ export function DayView() {
     [eventAPIVal]
   )
 
+  const activeDateObj = new Date(
+    `${activeDateVal.year}-${activeDateVal.month}-${activeDateVal.date}`
+  )
   return (
     <>
       <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
         <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-          {activeDateVal.year}-{activeDateVal.month}-{activeDateVal.date}
+          {format(activeDateObj, 'MMMM do, u')}
         </h3>
         <button
           type="button"
@@ -67,27 +88,39 @@ export function DayView() {
         </button>
       </div>
 
-      <div className="p-6 space-y-6">
+      <div className="py-4">
         {events.length === 0 && <div>No events</div>}
         {events.map((event) => {
           return (
             <div
               key={event.id}
-              className="flex flex-row justify-between items-center"
+              className="flex flex-row justify-between items-center py-1 border-radius-1"
             >
-              <div onClick={() => setActiveEventIdFn(event.id)}>
-                <div className="text-lg font-bold">{event.title}</div>
-                <div className="text-lg font-bold">
-                  {getTime(event.startTime)}
-                </div>
-                <div className="text-lg font-bold">
-                  {getTime(event.endTime)}
+              <div
+                onClick={() => setActiveEventIdFn(event.id)}
+                className="hover:bg-blue-500 hover:text-white transition flex-1 px-2 py-1 rounded overflow-hidden cursor-pointer"
+              >
+                <div className="font-bold">{event.title}</div>
+                <div className="font-thin">
+                  {format(event.startTime, 'h:mm a')} -{' '}
+                  {format(event.endTime, 'h:mm a')}
                 </div>
               </div>
-              <div>
-                <button onClick={() => deleteEventFn(event.id)}>x</button>
-              </div>
-              {isDeletePending(event.id) && <Spinner />}
+              {!isDeletePending(event.id) && (
+                <div
+                  onClick={() => deleteEventFn(event.id)}
+                  className="flex px-2 aspect-square self-stretch hover:bg-blue-500 hover:text-white transition rounded cursor-pointer"
+                >
+                  <button>
+                    <TrashIcon />
+                  </button>
+                </div>
+              )}
+              {isDeletePending(event.id) && (
+                <div>
+                  <Spinner />
+                </div>
+              )}
             </div>
           )
         })}

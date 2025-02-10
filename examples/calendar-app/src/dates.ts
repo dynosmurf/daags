@@ -1,4 +1,4 @@
-import { previousSunday, addDays } from 'date-fns'
+import { format, previousSunday, addDays } from 'date-fns'
 
 export function setTime(date: Date, time: string) {
   const [hours, minutes] = time.split(':')
@@ -10,9 +10,13 @@ export function setTime(date: Date, time: string) {
 }
 
 export function getTime(date: Date) {
-  return date.toISOString().split('T')[1].split('.')[0]
+  return format(date, 'HH:mm:ss')
 }
 
+export const getCurrentMonth = () => {
+  const d = new Date()
+  return new CalMonth(parseInt(format(d, 'u')), parseInt(format(d, 'M')))
+}
 export const monthNames = [
   'January',
   'February',
@@ -27,6 +31,8 @@ export const monthNames = [
   'November',
   'December'
 ]
+
+export const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export interface ICalMonth {
   year: number
