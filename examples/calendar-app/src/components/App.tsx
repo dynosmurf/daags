@@ -33,14 +33,21 @@ function App() {
       {!isLoaded && <Spinner />}
       {isLoaded && !activeCalendarVal && (
         <div className="flex items-center justify-center min-h-screen">
-          <div>
-            {calendarsVal.map((cal) => {
-              return (
-                <div className="p-2" onClick={() => setActiveCalendar(cal.id)}>
-                  {cal.name}
-                </div>
-              )
-            })}
+          <div className="w-1/4 px-4">
+            <h3 className="py-2 px-4 text-lg font-bold">Calendars</h3>
+            <div className="rounded-md border shadow-sm bg-gray-200 grid gap-[1px] overflow-hidden">
+              {calendarsVal.map((cal) => {
+                return (
+                  <div
+                    className="px-4 py-2 bg-white cursor-pointer hover:bg-blue-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    onClick={() => setActiveCalendar(cal.id)}
+                  >
+                    <div>{cal.name}</div>
+                    <div className="text-sm font-thin">{cal.desc}</div>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         </div>
       )}
