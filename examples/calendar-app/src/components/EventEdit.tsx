@@ -96,22 +96,23 @@ export function EventEdit() {
       </div>
       <div>
         <div className="flex flex-col justify-between p-4">
-          <label className="px-2 font-thin text-sm">Title</label>
-          <input
-            type="text"
-            className="border rounded-sm m-2 w-full p-2"
-            placeholder="Title"
-            value={localEvent.title}
-            onChange={(e) =>
-              setLocalEvent({ ...localEvent, title: e.target.value })
-            }
-          />
+          <div className="pb-2">
+            <label className="font-thin text-sm">Title</label>
+            <input
+              type="text"
+              className="border rounded-sm w-full p-2"
+              placeholder="Title"
+              value={localEvent.title}
+              onChange={(e) =>
+                setLocalEvent({ ...localEvent, title: e.target.value })
+              }
+            />
+          </div>
 
           <div className="py-2">
-            <label className="px-2 font-thin text-sm">Start Time</label>
+            <label className="font-thin text-sm">Start Time</label>
             <div>
               <input
-                className="px-2"
                 type="time"
                 value={getTime(localEvent.startTime)}
                 onChange={(e) =>
@@ -124,10 +125,9 @@ export function EventEdit() {
             </div>
           </div>
           <div className="py-2">
-            <label className="px-2 font-thin text-sm">End Time</label>
+            <label className="font-thin text-sm">End Time</label>
             <div>
               <input
-                className="px-2"
                 type="time"
                 value={getTime(localEvent.endTime)}
                 onChange={(e) =>
@@ -140,10 +140,10 @@ export function EventEdit() {
             </div>
           </div>
           <div className="py-2">
-            <label className="px-2 font-thin text-sm">Notes</label>
+            <label className="font-thin text-sm">Notes</label>
             <textarea
               placeholder="Description"
-              className="border rounded-sm m-2 w-full p-2"
+              className="border rounded-sm w-full p-2"
               value={localEvent.description}
               onChange={(e) =>
                 setLocalEvent({ ...localEvent, description: e.target.value })
@@ -151,7 +151,7 @@ export function EventEdit() {
             />
           </div>
         </div>
-        <div className="p-4 border-t rounded-b dark:border-gray-600">
+        <div className="flex justify-end p-4 border-t rounded-b dark:border-gray-600">
           <button
             className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             onClick={handleSave}

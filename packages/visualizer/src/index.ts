@@ -1,3 +1,4 @@
 import { StateGraph } from './StateGraph'
+import { WithVisualization } from './ResizableSidebar'
 
-export { StateGraph }
+export { StateGraph, WithVisualization }

@@ -94,11 +94,11 @@ export function DayView() {
           return (
             <div
               key={event.id}
-              className="flex flex-row justify-between items-center py-1 border-radius-1"
+              className="flex flex-row justify-between items-center py-1 px-2 pr-4 border-radius-1"
             >
               <div
                 onClick={() => setActiveEventIdFn(event.id)}
-                className="hover:bg-blue-500 hover:text-white transition flex-1 px-2 py-1 rounded overflow-hidden cursor-pointer"
+                className="hover:bg-blue-500 hover:text-white transition flex-1 px-2 py-1 mr-1 rounded-md overflow-hidden cursor-pointer"
               >
                 <div className="font-bold">{event.title}</div>
                 <div className="font-thin">
@@ -109,7 +109,7 @@ export function DayView() {
               {!isDeletePending(event.id) && (
                 <div
                   onClick={() => deleteEventFn(event.id)}
-                  className="flex px-2 aspect-square self-stretch hover:bg-blue-500 hover:text-white transition rounded cursor-pointer"
+                  className="flex px-4 aspect-square self-stretch hover:bg-blue-500 hover:text-white transition rounded-md cursor-pointer"
                 >
                   <button>
                     <TrashIcon />
@@ -126,11 +126,11 @@ export function DayView() {
         })}
       </div>
 
-      <div className="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
+      <div className="flex justify-end items-center px-4 py-4 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
         <button
           data-modal-hide="default-modal"
           type="button"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="text-white bg-blue-700 hover:bg-blue-500 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
           onClick={() => {
             setEditingActiveEventFn(true)
           }}

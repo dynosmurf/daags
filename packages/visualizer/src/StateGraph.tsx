@@ -113,12 +113,14 @@ export function StateGraph() {
 
   const handleSetIdx = (newIdx: number) => {
     setCurrentEventIdx(newIdx)
+    /*
     if (
       newIdx >= 0 &&
       ['change', 'mount', 'unmount'].includes(history[newIdx].type)
     ) {
       setActiveNode((history[newIdx] as any).entity.key)
     }
+    */
   }
 
   useEffect(() => {
@@ -181,130 +183,174 @@ export function StateGraph() {
   }
 
   return (
-    <div className="w-full relative h-screen overflow-y-auto p-4">
-      <svg id="svg" width={width + 4} height={height + 4}>
-        <g transform="translate(2, 2)">
-          <defs id="defs" />
-          <g id="links">
-            {links.map((link: any) => {
-              return (
-                <path
-                  key={link.source.data.id + link.target.data.id}
-                  d={line(link.points) as string}
-                  fill="none"
-                  strokeWidth="2"
-                  stroke={getStroke(link.target.data.entity)}
-                />
-              )
-            })}
-          </g>
-
-          <g id="nodes">
-            {nodes.map((node: any) => {
-              return (
-                <g
-                  key={node.data.id}
-                  transform={`translate(${node.x}, ${node.y})`}
-                  onClick={() => {
-                    setActiveNode(node.data.id)
-                  }}
-                >
-                  <circle
-                    r="40"
-                    stroke={getStroke(node.data.entity)}
-                    strokeWidth={getStrokeWidth(node.data.entity)}
-                    fill={
-                      activeEntity && activeEntity.key === node.data.entity.key
-                        ? '#e5e7eb'
-                        : '#ffffff'
-                    }
+    <div className="w-full flex flex-col relative pl-[8px] h-screen overflow-hidden">
+      {/* Tailwind Custom Animation */}
+      <style>
+        {`
+          @keyframes flashFade {
+            0% { color: blue; background-color: rgba(199, 210, 254, var(--tw-bg-opacity)); }
+            100% { color: black; background-color: rgba(243, 244, 246, var(--tw-bg-opacity)); }
+          }
+          .animate-flash {
+            animation: flashFade 5s ease-in-out;
+          }
+        `}
+      </style>
+      <div className="h-1/3 w-full flex items-center justify-center border-b p-2">
+        <svg
+          id="svg"
+          className="w-full h-full"
+          preserveAspectRatio="xMidYMid meet"
+          viewBox={`0 0 ${width + 4} ${height + 4}`}
+        >
+          <g transform="translate(2, 2)">
+            <defs id="defs" />
+            <g id="links">
+              {links.map((link: any) => {
+                return (
+                  <path
+                    key={link.source.data.id + link.target.data.id}
+                    d={line(link.points) as string}
+                    fill="none"
+                    strokeWidth="2"
+                    stroke={getStroke(link.target.data.entity)}
                   />
-                  <text
-                    fontWeight="bold"
-                    fontSize="10px"
-                    fontFamily="sans-serif"
-                    textAnchor="middle"
-                    alignmentBaseline="middle"
-                    fill="black"
-                  >
-                    {node.data.id}
-                  </text>
-                </g>
-              )
-            })}
-          </g>
+                )
+              })}
+            </g>
 
-          <g id="arrows">
-            {links.map((link: any) => {
-              return (
-                <path
-                  key={link.source.data.id + link.target.data.id}
-                  d={arrow() as string}
-                  fill={
-                    link.target.data.entity.isMounted() ? '#000000' : '#CCCCCC'
-                  }
-                  transform={arrowTransform(link)}
-                  stroke="white"
-                  strokeWidth="2"
-                  strokeDasharray={`${arrowLen},${arrowLen}`}
-                />
-              )
-            })}
-          </g>
-        </g>
-      </svg>
-      <div className="flex px-1">
-        <div className="px-1 w-1/2">
-          <div>
-            <a onClick={() => handleSetIdx(-1)}>Latest</a>
-          </div>
-          {history
-            .map((s: any, i) => {
-              return (
-                <div key={`1${i}-${s['timestamp']}-${s['type']}`}>
-                  <a
-                    className={
-                      i === currentEventIdx ? 'text-yellow-700' : 'text-black'
+            <g id="nodes">
+              {nodes.map((node: any) => {
+                return (
+                  <g
+                    key={node.data.id}
+                    transform={`translate(${node.x}, ${node.y})`}
+                    onClick={() => {
+                      setActiveNode(node.data.id)
+                    }}
+                  >
+                    <circle
+                      r="40"
+                      stroke={getStroke(node.data.entity)}
+                      strokeWidth={getStrokeWidth(node.data.entity)}
+                      fill={
+                        activeEntity &&
+                        activeEntity.key === node.data.entity.key
+                          ? '#e5e7eb'
+                          : '#ffffff'
+                      }
+                    />
+                    <text
+                      fontWeight="bold"
+                      fontSize="10px"
+                      fontFamily="sans-serif"
+                      textAnchor="middle"
+                      alignmentBaseline="middle"
+                      fill="black"
+                    >
+                      {node.data.id}
+                    </text>
+                  </g>
+                )
+              })}
+            </g>
+
+            <g id="arrows">
+              {links.map((link: any) => {
+                return (
+                  <path
+                    key={link.source.data.id + link.target.data.id}
+                    d={arrow() as string}
+                    fill={
+                      link.target.data.entity.isMounted()
+                        ? '#000000'
+                        : '#CCCCCC'
                     }
+                    transform={arrowTransform(link)}
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeDasharray={`${arrowLen},${arrowLen}`}
+                  />
+                )
+              })}
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div className="flex flex-1 h-2/3">
+        <div className="w-1/3 flex flex-col border-r border-gray-300">
+          <div className="sticky top-0 border-b p-2 flex items-baseline justify-between">
+            <h3>State Events</h3>
+            <a
+              className={
+                'text-underline text-sm cursor-pointer' +
+                (currentEventIdx === -1 ? ' text-blue-500' : ' text-grey-500')
+              }
+              onClick={() => handleSetIdx(-1)}
+            >
+              follow latest
+            </a>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {history
+              .map((s: any, i) => {
+                return (
+                  <div
+                    className={`px-2 animate-flash bg-gray-100 cursor-pointer hover:text-indigo-500 hover:bg-indigo-100 ${
+                      currentEventIdx === i ||
+                      (currentEventIdx === -1 && i === history.length - 1)
+                        ? 'text-pink-600 bg-pink-200'
+                        : ''
+                    }`}
+                    key={`1${i}-${s['timestamp']}-${s['type']}`}
                     onClick={() => handleSetIdx(i)}
                   >
-                    {s['type']} {s['entity'] && s['entity'].key}
-                    {s['mutation'] && s['mutation'].key} {s['async'] && 'async'}
-                  </a>
-                </div>
-              )
-            })
-            .reverse()}
+                    <a>
+                      {s['type']} {s['entity'] && s['entity'].key}
+                      {s['mutation'] && s['mutation'].key}{' '}
+                      {s['async'] && 'async'}
+                    </a>
+                  </div>
+                )
+              })
+              .reverse()}
+          </div>
         </div>
-        <div className="px-1 w-1/2">
-          {activeEntity && (
-            <div>
+        {activeEntity && (
+          <div className="w-1/2 flex flex-col border-r flex-1">
+            <div className="sticky top-0 border-b p-2 flex items-baseline justify-between">
+              <h3>Node Details</h3>
+            </div>
+            <div className="overflow-y-auto px-2 py-1">
               <p>node: {activeEntity.key}</p>
               <p>directMounts: {activeEntity.getDirectMounts()}</p>
               <p>totalMounts: {activeEntity.getTotalMounts()}</p>
               <div>
                 value:{' '}
-                <pre className="whitespace-pre-wrap">
+                <pre className="whitespace-pre-wrap text-sm">
                   {JSON.stringify(activeEntity.getState(), null, 2)}
                 </pre>
               </div>
             </div>
-          )}
-        </div>
-        <div className="px-1 w-1/2">
-          {activeMutation && (
-            <div>
+          </div>
+        )}
+        {activeMutation && (
+          <div className="w-1/2 flex flex-col flex-1">
+            <div className="sticky top-0 border-b p-2 flex items-baseline justify-between">
+              <h3>Mutation Details</h3>
+            </div>
+            <div className="overflow-y-auto px-2 py-1">
               <p>mutation: {activeMutation.mutation.key}</p>
               <p>deps: {Object.keys(activeMutation.mutation.deps)}</p>
               <div>
                 args:{' '}
-                <pre className="whitespace-pre-wrap">
+                <pre className="whitespace-pre-wrap text-sm">
                   {JSON.stringify(activeMutation.args, null, 2)}
                 </pre>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )
