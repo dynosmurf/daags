@@ -96,23 +96,12 @@ const calendarAPI = new Entity('calendarApi' as const, [], () => {})
 
 /* calendars */
 
-const calendarDB: Map<number, ICalendar> = new Map()
-for (let i = 0; i < 5; i++) {
-  calendarDB.set(i, {
-    id: i,
-    name: `Calendar ${i}`,
-    color: '#000000',
-    desc: `This is calendar ${i}`
-  })
-}
-
 async function getCalendars() {
   // mock api call
 
-  const request_promise = new Promise<ICalendar[]>((resolve) => {
-    setTimeout(() => {
-      resolve([...calendarDB.values()])
-    }, 600)
+  const request_promise = fetch('/api/calendars').then(async (response) => {
+    const result = await response.json()
+    return result
   })
 
   const calendars = await request_promise
@@ -173,67 +162,74 @@ function getUUID() {
   return Math.random().toString(36).substring(7)
 }
 
-const createEvent = (newEvent: IEvent) => {
+const createEvent = async (calendarId: number, newEvent: IEvent) => {
   // mock request promise
   const requestId = getUUID()
-  const request_promise = new Promise<IEvent>((resolve) => {
-    setTimeout(() => {
-      const nextId = Math.max(...eventsDB.keys()) + 1
-      newEvent = { ...newEvent, id: nextId }
-      eventsDB.set(nextId, newEvent)
-      createRequests[requestId] = {
-        ...createRequests[requestId],
-        status: 'success'
-      }
-      resolve(newEvent)
-    }, 800)
+
+  const requestPromise = fetch(`/api/calendars/${calendarId}/events`, {
+    method: 'POST',
+    body: JSON.stringify(newEvent)
   })
   createRequests[requestId] = {
-    promise: request_promise,
+    promise: requestPromise,
     timestamp: Date.now(),
     status: 'pending'
   }
 
-  return request_promise
+  await requestPromise
+  createRequests[requestId] = {
+    ...createRequests[requestId],
+    status: 'success'
+  }
+
+  return requestPromise
 }
 
-const deleteEvent = (eventId: number) => {
+const deleteEvent = async (calendarId: number, eventId: number) => {
   // mock request promise
   const requestId = getUUID()
-  const request_promise = new Promise<number>((resolve) => {
-    setTimeout(() => {
-      eventsDB.delete(eventId)
-      deleteRequests[requestId].status = 'success'
-      resolve(eventId)
-    }, 800)
-  })
+
+  const requestPromise = fetch(
+    `/api/calendars/${calendarId}/events/${eventId}`,
+    { method: 'DELETE' }
+  )
+
   deleteRequests[requestId] = {
-    promise: request_promise,
+    promise: requestPromise,
     timestamp: Date.now(),
     status: 'pending',
     id: eventId
   }
-  return request_promise
+  await requestPromise
+  deleteRequests[requestId] = {
+    ...deleteRequests[requestId],
+    status: 'success'
+  }
+
+  return requestPromise
 }
 
-const updateEvent = (modifiedEvent: IEvent) => {
+const updateEvent = async (calendarId: number, modifiedEvent: IEvent) => {
   // mock request promise
   const requestId = getUUID()
-  const request_promise = new Promise<IEvent>((resolve) => {
-    setTimeout(() => {
-      const eventId = modifiedEvent.id
-      updateRequests[requestId].status = 'success'
-      eventsDB.set(eventId, modifiedEvent)
-      resolve(modifiedEvent)
-    }, 800)
+  const requestPromise = fetch(`/api/calendars/${calendarId}/events`, {
+    method: 'PUT',
+    body: JSON.stringify(modifiedEvent)
   })
+
   updateRequests[requestId] = {
-    promise: request_promise,
+    promise: requestPromise,
     timestamp: Date.now(),
     status: 'pending',
     id: modifiedEvent.id
   }
-  return request_promise
+  await requestPromise
+  updateRequests[requestId] = {
+    ...updateRequests[requestId],
+    status: 'success'
+  }
+
+  return requestPromise
 }
 
 const getEventApiState = () => {
@@ -249,8 +245,8 @@ export const eventAPI = new Entity('eventAPI' as const, [], getEventApiState)
 export const createEventMutation = new Mutation(
   'createEvent' as const,
   [eventAPI],
-  (deps, event) => {
-    const p = createEvent(event).then((e) => {
+  (deps, calendarId: number, event: IEvent) => {
+    const p = createEvent(calendarId, event).then((e) => {
       deps.eventAPI.handleParentChange()
       return e
     })
@@ -261,8 +257,8 @@ export const createEventMutation = new Mutation(
 export const updateEventMutation = new Mutation(
   'updateEvent' as const,
   [eventAPI],
-  (deps, event) => {
-    const p = updateEvent(event).then(() => {
+  (deps, calendarId: number, event: IEvent) => {
+    const p = updateEvent(calendarId, event).then(() => {
       deps.eventAPI.handleParentChange()
     })
     deps.eventAPI.handleParentChange()
@@ -272,8 +268,8 @@ export const updateEventMutation = new Mutation(
 export const deleteEventMutation = new Mutation(
   'deleteEvent' as const,
   [eventAPI],
-  (deps, eventId) => {
-    const p = deleteEvent(eventId).then(() => {
+  (deps, calendarId: number, eventId: number) => {
+    const p = deleteEvent(calendarId, eventId).then(() => {
       deps.eventAPI.handleParentChange()
     })
     deps.eventAPI.handleParentChange()
@@ -351,18 +347,27 @@ export const setActiveMonth = new Mutation(
 
 /* currentMonthEvents */
 
-const getEvents = async (calendarId: number) => {
+const getEvents = async (calendarId: number | null) => {
   // mock api call
+  if (calendarId === null || !isFinite(calendarId)) {
+    return null
+  }
 
-  const request_promise = new Promise<IEvent[]>((resolve) => {
-    setTimeout(() => {
-      if (calendarId === 4) {
-        resolve([...eventsDB.values()])
-      } else {
-        resolve([])
+  const request_promise = fetch(`/api/calendar/${calendarId}/events`).then(
+    async (response) => {
+      const result = (await response.json()) as any[]
+      const formattedResult = []
+      for (const event of result) {
+        formattedResult.push({
+          ...event,
+          date: new Date(event.date),
+          startTime: new Date(event.startTime),
+          endTime: new Date(event.endTime)
+        })
       }
-    }, 800)
-  })
+      return formattedResult as IEvent[]
+    }
+  )
 
   const events = await request_promise
 
@@ -519,12 +524,6 @@ export const activeEvent = new Entity(
     return getActiveEvent(deps[0].getState(), deps[1].getState())
   }
 )
-
-/* page */
-
-export const page = new Entity('page' as const, [], () => {
-  return 'calendar'
-})
 
 /* editingActiveEvent */
 

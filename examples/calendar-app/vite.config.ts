@@ -13,7 +13,8 @@ export default defineConfig({
       '@daags/visualizer': path.resolve(
         __dirname,
         '../../packages/visualizer/src'
-      )
+      ),
+      '@daags/core': path.resolve(__dirname, '../../packages/core/src')
     }
   }
 })

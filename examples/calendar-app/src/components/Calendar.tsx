@@ -48,7 +48,7 @@ export const Calendar = memo(() => {
         <div className="flex">
           <h1
             className="text-3xl text-left w-full cursor-pointer"
-            onClick={clearActiveCalendar}
+            onClick={() => clearActiveCalendar()}
           >
             {activeCalendarVal.name}
           </h1>
@@ -90,7 +90,11 @@ export const Calendar = memo(() => {
         <div className="w-full rounded-lg border border-gray-200 overflow-hidden bg-gray-200">
           <div className="grid grid-cols-7 w-full gap-[1px]">
             {dayNames.map((day) => {
-              return <div className="py-1 text-center bg-white">{day}</div>
+              return (
+                <div key={day} className="py-1 text-center bg-white">
+                  {day}
+                </div>
+              )
             })}
             {daysInMonth.map((week, i) => {
               return week.map((day, j) => {

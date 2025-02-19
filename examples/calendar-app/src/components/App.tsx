@@ -20,10 +20,9 @@ function App() {
   const editingActiveEventVal = useEntity(editingActiveEvent)
   const calendarsVal = useEntity(calendars)
   const activeCalendarVal = useEntity(activeCalendar)
-  const currentMonthEventsVal = useEntity(currentMonthEvents)
   const setActiveCalendar = useMutation(setCalendarId)
 
-  const isLoaded = calendarsVal !== null && currentMonthEventsVal !== null
+  const isLoaded = calendarsVal !== null
 
   const isAsideActive =
     Number.isFinite(activeEventIdVal) || activeDateVal !== null
@@ -39,6 +38,7 @@ function App() {
               {calendarsVal.map((cal) => {
                 return (
                   <div
+                    key={cal.name}
                     className="px-4 py-2 bg-white cursor-pointer hover:bg-blue-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     onClick={() => setActiveCalendar(cal.id)}
                   >
