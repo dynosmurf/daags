@@ -37,7 +37,7 @@ export const Calendar = memo(() => {
     return <>Must specify month to display.</>
   }
   if (activeCalendarVal === null) {
-    return <>No matching calander found.</>
+    return <>No matching calendar found.</>
   }
   const eventList = events || []
   const daysInMonth = getDaysInMonth(activeMonthVal)
@@ -96,7 +96,7 @@ export const Calendar = memo(() => {
                 </div>
               )
             })}
-            {daysInMonth.map((week, i) => {
+            {daysInMonth.map((week) => {
               return week.map((day, j) => {
                 const isActive = activeDateVal && datesMatch(day, activeDateVal)
                 const isPadding = day.month !== activeMonthVal?.month

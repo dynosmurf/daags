@@ -45,7 +45,7 @@ export function DayView() {
   }
 
   const isDeletePending = useCallback(
-    (id: number) => {
+    (id: string) => {
       return Object.values(eventAPIVal?.deleteRequests || {})
         .map((request) => {
           return request.id === id && request.status === 'pending'
@@ -108,7 +108,7 @@ export function DayView() {
               </div>
               {!isDeletePending(event.id) && (
                 <div
-                  onClick={() => deleteEventFn(event.id)}
+                  onClick={() => deleteEventFn(event.calendarId, event.id)}
                   className="flex px-4 aspect-square self-stretch hover:bg-blue-500 hover:text-white transition rounded-md cursor-pointer"
                 >
                   <button>

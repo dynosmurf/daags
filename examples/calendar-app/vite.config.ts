@@ -14,7 +14,8 @@ export default defineConfig({
         __dirname,
         '../../packages/visualizer/src'
       ),
-      '@daags/core': path.resolve(__dirname, '../../packages/core/src')
+      '@daags/core': path.resolve(__dirname, '../../packages/core/src'),
+      '@daags/hooks': path.resolve(__dirname, '../../packages/hooks/src')
     }
   }
 })

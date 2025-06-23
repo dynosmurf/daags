@@ -6,7 +6,7 @@ interface ResizableSidebarProps {
 }
 
 export const WithVisualization = ({ mainContent }: ResizableSidebarProps) => {
-  const [sidebarWidth, setSidebarWidth] = useState(300) // Initial width
+  const [sidebarWidth, setSidebarWidth] = useState(Math.max(Math.min(window.innerWidth / 2, 960), 480)) // Initial width
   const isResizing = useRef(false)
 
   const startResizing = () => {

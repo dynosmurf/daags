@@ -3,19 +3,22 @@ import { Entity, Mutation } from '@daags/core'
 
 export function useEntity<T>(entity: Entity<T, any>) {
   const [value, setValue] = useState(entity.getState())
+  const caller =
+    new Error().stack?.split('\n')[2].trim().split(' ')[1] || 'Unknown'
 
   useEffect(() => {
-    entity.mount()
     setValue(entity.getState())
 
     const changeHandler = () => {
       setValue(entity.getState())
     }
-    entity.onChange(changeHandler)
+    entity.onChange(changeHandler, caller)
+
+    entity.mount()
 
     return () => {
-      entity.unmount()
       entity.cancelOnChange(changeHandler)
+      entity.unmount()
     }
   }, [])
 

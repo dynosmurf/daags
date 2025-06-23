@@ -3,22 +3,23 @@ import { getTime, setTime } from '../dates'
 import {
   IEvent,
   activeEvent,
-  activeEventId,
   setEditingActiveEvent,
   createEventMutation,
   updateEventMutation,
   setActiveEventId,
   getDefaultEvent,
-  eventAPI
+  eventAPI,
+  activeCalendar
 } from '../entities'
 import { useEntity, useMutation } from '@daags/hooks'
 import { Spinner } from './ui/Spinner'
 
 export function EventEdit() {
   const event = useEntity(activeEvent)
-  const activeEventIdVal = useEntity(activeEventId)
-  const isNew = activeEventIdVal === null
+  const activeEventVal = useEntity(activeEvent)
+  const isNew = activeEventVal === null
   const setEditingActiveEventFn = useMutation(setEditingActiveEvent)
+  const activeCalendarVal = useEntity(activeCalendar)
   const createEvent = useMutation(createEventMutation)
   const updateEvent = useMutation(updateEventMutation)
   const setActiveEventIdFn = useMutation(setActiveEventId)
@@ -46,7 +47,8 @@ export function EventEdit() {
 
   const handleSave = useCallback(() => {
     if (isNew) {
-      createEvent(localEvent).then((newEvent: IEvent) => {
+      localEvent.calendarId = activeCalendarVal.id
+      createEvent(localEvent).then((newEvent) => {
         setActiveEventIdFn(null)
         setLocalEvent(newEvent)
         setEditingActiveEventFn(false)

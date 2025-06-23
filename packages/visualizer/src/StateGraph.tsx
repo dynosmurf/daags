@@ -161,13 +161,28 @@ export function StateGraph() {
   const nodes = [...graph.nodes()]
   const links = [...graph.links()]
 
-  const getStroke = (entity: Entity<any, any>) => {
+  const getEdgeStroke = (
+    source: Entity<any, any>,
+    target: Entity<any, any>
+  ) => {
+    if (!target.isMounted()) {
+      return '#CCCCCC'
+    }
+    if (source.pendingParentCount > 0 || source.pendingPromise !== null) {
+      return 'url(#pending)'
+    }
+
+    return '#000000'
+  }
+
+  const getNodeStroke = (entity: Entity<any, any>) => {
     if (!entity.isMounted()) {
       return '#CCCCCC'
     }
-    if (entity.getDirectMounts() === 0) {
-      return '#000000'
+    if (entity.pendingParentCount > 0 || entity.pendingPromise !== null) {
+      return 'url(#pending)'
     }
+
     return '#000000'
   }
 
@@ -203,6 +218,26 @@ export function StateGraph() {
           preserveAspectRatio="xMidYMid meet"
           viewBox={`0 0 ${width + 4} ${height + 4}`}
         >
+          <defs>
+            <linearGradient id="pending" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="cyan">
+                <animate
+                  attributeName="stop-color"
+                  values="cyan; magenta; yellow; cyan"
+                  dur="4s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+              <stop offset="100%" stopColor="magenta">
+                <animate
+                  attributeName="stop-color"
+                  values="magenta; yellow; cyan; magenta"
+                  dur="4s"
+                  repeatCount="indefinite"
+                />
+              </stop>
+            </linearGradient>
+          </defs>
           <g transform="translate(2, 2)">
             <defs id="defs" />
             <g id="links">
@@ -213,7 +248,10 @@ export function StateGraph() {
                     d={line(link.points) as string}
                     fill="none"
                     strokeWidth="2"
-                    stroke={getStroke(link.target.data.entity)}
+                    stroke={getEdgeStroke(
+                      link.source.data.entity,
+                      link.target.data.entity
+                    )}
                   />
                 )
               })}
@@ -231,7 +269,7 @@ export function StateGraph() {
                   >
                     <circle
                       r="40"
-                      stroke={getStroke(node.data.entity)}
+                      stroke={getNodeStroke(node.data.entity)}
                       strokeWidth={getStrokeWidth(node.data.entity)}
                       fill={
                         activeEntity &&
@@ -301,14 +339,13 @@ export function StateGraph() {
                       (currentEventIdx === -1 && i === history.length - 1)
                         ? 'text-pink-600 bg-pink-200'
                         : ''
-                    }`}
+                    } ${i > 0 && history[i].tick !== history[i-1].tick ? ' border-b border-pink-300': ''}`}
                     key={`1${i}-${s['timestamp']}-${s['type']}`}
                     onClick={() => handleSetIdx(i)}
                   >
-                    <a>
-                      {s['type']} {s['entity'] && s['entity'].key}
+                    <a>{s['type'] === 'mutation' || s['async'] ? '' : '\u00A0\u00A0\u00A0\u00A0'}
+                      {s['async'] ? 'async' : s['type']} {s['entity'] && s['entity'].key}
                       {s['mutation'] && s['mutation'].key}{' '}
-                      {s['async'] && 'async'}
                     </a>
                   </div>
                 )
@@ -323,8 +360,16 @@ export function StateGraph() {
             </div>
             <div className="overflow-y-auto px-2 py-1">
               <p>node: {activeEntity.key}</p>
-              <p>directMounts: {activeEntity.getDirectMounts()}</p>
+              <p>
+                directMounts: {activeEntity.getDirectMounts()}
+                {activeEntity.listenerCallers.length > 0 && ` (${activeEntity.listenerCallers.join(', ')})`}
+              </p>
               <p>totalMounts: {activeEntity.getTotalMounts()}</p>
+              <p>
+                selfStatus:{' '}
+                {activeEntity.pendingPromise !== null ? 'pending' : 'idle'}
+              </p>
+              <p>pendingParents: {activeEntity.pendingParentCount} </p>
               <div>
                 value:{' '}
                 <pre className="whitespace-pre-wrap text-sm">

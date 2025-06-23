@@ -32,15 +32,25 @@ export function mapEntities<const T extends readonly [...Entity<any, any>[]]>(
 }
 
 interface MutationSnapshot {
-  timestamp: number
+  timestamp: number,
+  tick: number
   type: 'mutation'
   mutation: Mutation<any, any, any, string>
   args: any[]
   snapshot: Record<string, Entity<any, any>>
 }
 
+interface GetSnapshot {
+  timestamp: number
+  tick: number
+  type: 'get'
+  entity: Entity<any, any>
+  snapshot: Record<string, Entity<any, any>>
+}
+
 interface ChangeSnapshot {
   timestamp: number
+  tick: number
   type: 'change'
   async: boolean
   entity: Entity<any, any>
@@ -49,6 +59,7 @@ interface ChangeSnapshot {
 
 interface MountSnapshot {
   timestamp: number
+  tick: number
   type: 'mount' | 'unmount'
   entity: Entity<any, any>
   snapshot: Record<string, Entity<any, any>>
@@ -60,17 +71,47 @@ class EventEmitter extends EventTarget {
   }
 }
 
+let tickCount = 0;
+let shouldIncrement = false;
+
 export class History {
-  public static events: (MutationSnapshot | ChangeSnapshot | MountSnapshot)[] =
-    []
+  public static incrementTickCount() {
+    shouldIncrement = true;
+    setTimeout(() => {
+      if (shouldIncrement) {
+        tickCount++;
+        shouldIncrement = false
+      }
+    }, 0)
+  }
+  public static events: (
+    | MutationSnapshot
+    | GetSnapshot
+    | ChangeSnapshot
+    | MountSnapshot
+  )[] = []
   public static eventEmitter: EventEmitter = new EventEmitter()
+
+  public static recordGetEvent(entity: Entity<any, any>) {
+    History.incrementTickCount()
+    History.events.push({
+      timestamp: Date.now(),
+      tick: tickCount,
+      type: 'get',
+      entity,
+      snapshot: History.getSnapshot()
+    })
+    History.eventEmitter.emit()
+  }
 
   public static recordChangeEvent(
     entity: Entity<any, any>,
     async: boolean = false
   ) {
+    History.incrementTickCount()
     History.events.push({
       timestamp: Date.now(),
+      tick: tickCount,
       type: 'change',
       entity,
       async,
@@ -80,8 +121,10 @@ export class History {
   }
 
   public static recordMountEvent(entity: Entity<any, any>) {
+    History.incrementTickCount()
     History.events.push({
       timestamp: Date.now(),
+      tick: tickCount,
       type: 'mount',
       entity,
       snapshot: History.getSnapshot()
@@ -90,8 +133,10 @@ export class History {
   }
 
   public static recordUnmountEvent(entity: Entity<any, any>) {
+    History.incrementTickCount()
     History.events.push({
       timestamp: Date.now(),
+      tick: tickCount,
       type: 'unmount',
       entity,
       snapshot: History.getSnapshot()
@@ -103,8 +148,10 @@ export class History {
     mutation: Mutation<any, any, any, string>,
     args: any[]
   ) {
+    History.incrementTickCount()
     History.events.push({
       timestamp: Date.now(),
+      tick: tickCount,
       type: 'mutation',
       mutation,
       args,
@@ -158,13 +205,14 @@ export class Entity<T, K extends string> {
   // State nodes from which the state of this node can be derived either directly or with call to external store
   public key: K
   private parents: EntityDeps = []
+  private status: 'pending' | 'idle' = 'idle'
 
   // State nodes which depend on the value of this state node
   private children: EntityDeps = []
 
   // Function which returns the value of this node given the values of all
   // parents
-  private valueFn: ValueFn<Promise<T>> | ValueFn<T>
+  private valueFn: ValueFn<T>
 
   // The current value of this node
   private value: T | null = null
@@ -185,13 +233,13 @@ export class Entity<T, K extends string> {
   // Functions which will be called when the value of this node changes either
   // as a result of a direct mutation or a parent value changing.
   private listeners: (() => void)[] = []
+  public listenerCallers: (string | undefined)[] = []
   private mountListeners: (() => void)[] = []
 
-  constructor(
-    key: K,
-    parents: EntityDeps,
-    valueFn: ValueFn<Promise<T>> | ValueFn<T>
-  ) {
+  public pendingPromise: Promise<T> | null = null
+  public pendingParentCount: number = 0
+
+  constructor(key: K, parents: EntityDeps, valueFn: ValueFn<T>) {
     this.key = key
     this.parents = parents
     this.parentVersions = parents.map(() => -1)
@@ -204,14 +252,16 @@ export class Entity<T, K extends string> {
     Entity.registered[key] = this
   }
 
-  public onChange(listener: () => void) {
+  public onChange(listener: () => void, caller?: string) {
     this.listeners.push(listener)
+    this.listenerCallers.push(caller)
   }
 
   public cancelOnChange(listener: () => void) {
     const idx = this.listeners.indexOf(listener)
     if (idx >= 0) {
       this.listeners.splice(idx, 1)
+      this.listenerCallers.splice(idx, 1)
     }
   }
 
@@ -270,6 +320,20 @@ export class Entity<T, K extends string> {
     }
   }
 
+  public handleParentPending() {
+    this.pendingParentCount++
+    for (const child of this.children) {
+      child.handleParentPending()
+    }
+  }
+
+  public handleParentResolve() {
+    this.pendingParentCount--
+    for (const child of this.children) {
+      child.handleParentResolve()
+    }
+  }
+
   public handleParentChange() {
     /**
      * Should only execute if for any parent value != prevVal
@@ -286,10 +350,53 @@ export class Entity<T, K extends string> {
       // noop
       return
     }
+
+    if (this.pendingParentCount > 0) {
+      // a parent has changed but one or more parents are still in pending
+      // state so no recomputation should be performed until they are idle.
+      // TODO: is this actually the behavior we want, it could be the case that
+      // multiple pending parents cause the application to become deadlocked.
+      // A better behavior might be to recompute with the recieved value but
+      // maintain the pending status of children.
+      return
+    }
+
     const result = this.valueFn(this.parents)
     if (result instanceof Promise) {
-      History.recordChangeEvent(this)
+      if (this.status !== 'pending') {
+        for (const child of this.children) {
+          // we only want to recurse to mounted children
+          child.handleParentPending()
+        }
+      }
+      this.pendingPromise = result
+      this.status = 'pending'
+
+      // this will immediately set the status of all child nodes to be pending
+      // need to set current node status to pending
+      // need to push promise onto queue of pending promises for this node
+      // need to propigate status to all children
+
+      History.recordGetEvent(this)
       ;(result as Promise<T>).then((value: T) => {
+        if (result !== this.pendingPromise) {
+          // if the promise currently being resolved isn't the last promise to be queued
+          // we want to do nothing
+          return
+        } else {
+          // we actually need to keep track of the state of each parent. We should
+          // not set the state of a child to be idle unless all parents have resolved.
+          this.status = 'idle'
+          this.pendingPromise = null
+          for (const child of this.children) {
+            child.handleParentResolve()
+          }
+        }
+        // need to remove this promise from set of pending promises for node
+        // if it was the most recent to be pushed to the queue then we want
+        // to handle
+
+        // How do we want to handle the behavior here or should it be configurable?
         this.prevValue = this.value
         this.value = cloneDeep(value)
         if (!isEqual(this.value, this.prevValue)) {
@@ -301,6 +408,8 @@ export class Entity<T, K extends string> {
             }
           }
           this.notifyListeners()
+        } else {
+          History.recordChangeEvent(this, true)
         }
       })
     } else {

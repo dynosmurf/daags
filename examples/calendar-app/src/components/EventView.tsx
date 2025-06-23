@@ -9,6 +9,7 @@ import { format } from 'date-fns'
 
 export function EventView() {
   const event = useEntity(activeEvent)
+
   const setActiveEventIdFn = useMutation(setActiveEventId)
   const setEditingActiveEventFn = useMutation(setEditingActiveEvent)
 

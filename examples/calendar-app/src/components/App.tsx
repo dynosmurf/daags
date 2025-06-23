@@ -4,19 +4,18 @@ import { EventEdit } from './EventEdit'
 import { EventView } from './EventView'
 import {
   activeDate,
-  activeEventId,
   editingActiveEvent,
   calendars,
-  currentMonthEvents,
   activeCalendar,
-  setCalendarId
+  setCalendarId,
+  activeEvent
 } from '../entities'
 import { useEntity, useMutation } from '@daags/hooks'
 import { Spinner } from './ui/Spinner'
 
 function App() {
   const activeDateVal = useEntity(activeDate)
-  const activeEventIdVal = useEntity(activeEventId)
+  const activeEventVal = useEntity(activeEvent)
   const editingActiveEventVal = useEntity(editingActiveEvent)
   const calendarsVal = useEntity(calendars)
   const activeCalendarVal = useEntity(activeCalendar)
@@ -24,8 +23,7 @@ function App() {
 
   const isLoaded = calendarsVal !== null
 
-  const isAsideActive =
-    Number.isFinite(activeEventIdVal) || activeDateVal !== null
+  const isAsideActive = activeEventVal || activeDateVal !== null
 
   return (
     <div className="relative bg-[#fff] h-screen overflow-y-auto">
@@ -40,7 +38,9 @@ function App() {
                   <div
                     key={cal.name}
                     className="px-4 py-2 bg-white cursor-pointer hover:bg-blue-500 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-                    onClick={() => setActiveCalendar(cal.id)}
+                    onClick={() => {
+                      setActiveCalendar(cal.id)
+                    }}
                   >
                     <div>{cal.name}</div>
                     <div className="text-sm font-thin">{cal.desc}</div>
@@ -64,10 +64,10 @@ function App() {
             }`}
           >
             {activeDateVal &&
-              !Number.isFinite(activeEventIdVal) &&
+              !activeEventVal &&
               !editingActiveEventVal && <DayView />}
 
-            {!editingActiveEventVal && Number.isFinite(activeEventIdVal) && (
+            {!editingActiveEventVal && activeEventVal && (
               <EventView />
             )}
 
